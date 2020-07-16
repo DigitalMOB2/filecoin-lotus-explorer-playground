@@ -18,6 +18,15 @@ import { NodeModal } from './NodeModal/NodeModal'
 import { tooltip } from './tooltip'
 
 const LaGraphaComponent = () => {
+  if (document.getElementsByClassName('concrete-scene-canvas')[0]) {
+    console.log(window);
+    console.log(document.getElementsByClassName('concrete-scene-canvas')[0]);
+    const ourCanvas = document.getElementsByClassName('concrete-scene-canvas')[0];
+    const canvasSVGContext = new window.CanvasSVG.Deferred(); 
+    canvasSVGContext.wrapCanvas(ourCanvas);
+    const canvasContext = ourCanvas.getContext("2d");
+    console.log(canvasContext.getSVG());
+  }
   const { state, dispatch } = useContext(store)
   const { chain, loading: loadingData, filter, selectedNode, isNodeModalOpen } = state
   const { blockRange, startDate, endDate, miner, cid, showHeightRuler } = filter
