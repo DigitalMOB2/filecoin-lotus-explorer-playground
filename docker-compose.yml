@@ -1,5 +1,9 @@
 version: '3.7'
 
+volumes:
+  explorer_client_node_modules_volume:
+  explorer_server_node_modules_volume:
+
 services:
   proxy:
     image: jwilder/nginx-proxy
@@ -17,6 +21,8 @@ services:
     build: ./client
     volumes:
       - ./client:/usr/src/app
+      - explorer_client_node_modules_volume:/usr/src/app/node_modules
+
     depends_on:
       - server
     links:
@@ -35,6 +41,7 @@ services:
     build: ./server
     volumes:
       - ./server:/usr/src/app
+      - explorer_server_node_modules_volume:/usr/src/app/node_modules
     ports:
       - '8888:8888'
     depends_on:
