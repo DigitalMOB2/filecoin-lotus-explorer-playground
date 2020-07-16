@@ -1,42 +1,3 @@
-> agency enterprise filecoin-explorer-lotus
-
-# Usage
-
-First, you need lotus up and running. Follow [these instructions](https://docs.lotu.sh/en+install-lotus-ubuntu).
-
-Next, run the daemon, sync the chain, and run the chain watcher.
-
-```bash
-$ ./lotus daemon
-
-# in another terminal
-$ ./lotus sync wait
-
-# in yet another terminal
-$ ./chainwatch --db='postgres://postgres:@localhost:5432/lotus?sslmode=disable' run
-
-or
-
-$ go run ./cmd/lotus-chainwatch --db postgres://user:password@localhost:5434/lotus?sslmode=disable run
-
-```
-
-Finally, inside of this repo's directory, run the following commands:
-
-```bash
-# use docker-compose
-$ docker-compose up
-
-# or, use yarn / npm
-$ yarn install
-$ yarn start
-```
-
-# License
-
-[LICENSE](LICENSE)
-
-```
 The MIT License (MIT)
 
 Copyright (c) 2020 Agency Enterprise
@@ -58,4 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-```

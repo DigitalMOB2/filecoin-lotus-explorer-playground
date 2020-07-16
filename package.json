@@ -1,0 +1,42 @@
+{
+  "name": "filecoin-explorer-lotus",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "dependencies": {
+    "@babel/core": "^7.7.5",
+    "@babel/node": "^7.7.4",
+    "@babel/preset-env": "^7.7.6",
+    "@types/node": "^13.5.0",
+    "babel-node": "^0.0.1-security",
+    "dotenv": "^8.2.0",
+    "elgrapho": "^2.4.0",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.2",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5"
+  },
+  "scripts": {
+    "start": "ts-node index.ts",
+    "dev": "yarn client & yarn server-dev",
+    "server": "yarn --cwd 'server' start",
+    "server-dev": "yarn --cwd 'server' dev",
+    "client": "yarn --cwd 'client' start",
+    "build-client": "yarn --cwd 'client' build",
+    "build": "yarn build-client",
+    "test-client": "yarn --cwd 'client' test",
+    "test-server": "yarn --cwd 'server' test",
+    "test": "yarn test-client && yarn test-server",
+    "install-client": "yarn --cwd 'client' install",
+    "install-server": "yarn --cwd 'server' install",
+    "install": "yarn install-client && yarn install-server"
+  },
+  "devDependencies": {
+    "yarn": "^1.21.1"
+  },
+  "engines": {
+    "node": "12"
+  },
+  "author": "Agency Enterprise",
+  "license": "MIT"
+}

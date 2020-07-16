@@ -1,0 +1,131 @@
+html,
+body,
+#root,
+#root > div,
+#main {
+  height: 100%;
+}
+
+#root {
+  overflow: hidden;
+}
+
+body {
+  font-family: Arco Perpetuo Pro;
+  color: #212121;
+  overflow-x: hidden;
+}
+
+div.dc-chart {
+  float: none;
+}
+
+#minerPie,
+#blockHeightPie,
+#orphanPie,
+#weirdTimeBar {
+  margin: 26px 0;
+  text-align: center;
+}
+
+.dc-chart .selected path,
+.dc-chart .selected circle {
+  stroke-width: 0;
+}
+
+.Toastify {
+  line-height: 18px;
+}
+
+.Toastify strong {
+  font-weight: 800;
+}
+
+g.rect-hoverable > rect:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+div.d3-tooltip {
+  position: absolute;
+  text-align: center;
+  padding: 5px 10px;
+  font: 12px Arco Perpetuo Pro;
+  background: #212121;
+  color: white;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+/* Tooltip */
+
+div.el-grapho-tooltip {
+  background-color: #212121;
+  color: #e7e7e7;
+  margin-top: -9px;
+  overflow: hidden;
+  font-family: Arco Perpetuo Pro;
+  font-size: 12px;
+  line-height: 16px;
+  padding: 0;
+}
+
+.el-grapho-tooltip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: '\25BC';
+  position: absolute;
+  text-align: center;
+}
+
+.el-grapho-tooltip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
+.el-grapho-tooltip table tr td {
+  word-break: break-all;
+}
+
+.el-grapho-tooltip table tr:first-child {
+  background-color: black;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.02em;
+}
+
+.el-grapho-tooltip table tr:first-child td {
+  padding: 8px 16px;
+}
+
+.el-grapho-tooltip table tr:nth-child(2) td {
+  padding-top: 8px;
+}
+
+.el-grapho-tooltip table tr:last-child td {
+  padding-bottom: 16px;
+}
+
+.el-grapho-tooltip td:first-child {
+  padding: 4px 8px 4px 16px;
+  font-weight: 600;
+  max-width: 116px;
+}
+
+.el-grapho-tooltip td:last-child {
+  padding: 4px 16px 4px 8px;
+  max-width: 156px;
+}
+
+/* Datepicker */
+
+.react-datepicker-wrapper {
+  width: 100%;
+}

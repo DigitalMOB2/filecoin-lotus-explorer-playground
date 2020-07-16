@@ -1,0 +1,78 @@
+version: '3.7'
+
+services:
+  proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  dockerhost:
+    image: qoomon/docker-host
+    cap_add: ['NET_ADMIN', 'NET_RAW']
+    restart: on-failure
+
+  site:
+    build: ./client
+    volumes:
+      - ./client:/usr/src/app
+    depends_on:
+      - server
+    links:
+      - server
+    ports:
+      - '3000:3000'
+    command: yarn start
+    environment:
+      NODE_ENV: development
+      FORCE_COLOR: 1
+      VIRTUAL_HOST: site.localtest.me
+      VIRTUAL_PORT: 3000
+      REACT_APP_API_URL: http://server.localtest.me/api
+
+  server:
+    build: ./server
+    volumes:
+      - ./server:/usr/src/app
+    ports:
+      - '8888:8888'
+    depends_on:
+      - dockerhost
+      - db
+    links:
+      - dockerhost
+      - db
+    environment:
+      NODE_ENV: development
+      FORCE_COLOR: 1
+      HOST: 0.0.0.0
+      PORT: 8888
+      VIRTUAL_HOST: server.localtest.me
+      VIRTUAL_PORT: 8888
+      DATABASE_URL: postgres://user:password@db/lotus
+      #DATABASE_URL: postgres://u1uctel078otia:pc9971b37ea081163da68744741770ea218ffc98ac459c2de03fffc00e7eaacb2@ec2-3-224-134-18.compute-1.amazonaws.com:5432/d7j8iof2h9bdi
+      DATABASE_SSL: 'false'
+      DATABASE_POOL_MIN: 0
+      DATABASE_POOL_MAX: 10
+
+  db:
+    image: postgres:10.4
+    ports:
+      - '5432:5432'
+    command: postgres -D /run/pgsql-10.4-data -c logging_collector=on
+    volumes:
+      - ./api/db/local_database_volume:/run/pgsql-10.4-data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      COMPOSE_HTTP_TIMEOUT: 200
+      LOGGING_COLLECTOR: 'on'
+      PGDATA: /run/pgsql-10.4-data
+      POSTGRES_DB: lotus
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
