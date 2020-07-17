@@ -3,18 +3,7 @@ import { db } from '../'
 export const getBlockById = async (id) => {
   const { rows } = await db.query(
     `
-    SELECT
-      block,
-      parent,
-      b.miner,
-      b.height,
-      b.timestamp
-
-    FROM
-      block_parents
-    INNER JOIN
-      blocks b on block_parents.block = b.cid
-
+    SELECT * from chain_visualizer_blocks_with_parents_view
     WHERE
       block = $1`,
     [id],
@@ -32,7 +21,7 @@ export const getBlockRange = async () => {
       MAX(height) AS "maxHeight"
 
     FROM
-      blocks
+      chain_visualizer_blocks_view
     `,
     [],
   )
@@ -51,7 +40,7 @@ export const getBlockHeight = async (id) => {
       cid,
       height
     FROM
-      blocks
+      chain_visualizer_blocks_view
     WHERE
       cid = $1 `,
     [id],
