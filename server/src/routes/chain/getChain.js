@@ -1,4 +1,6 @@
 import { getChain as getChainData, getMessagesCount, getOrphans } from '../../services/db/chain'
+import { mockData1, mockData2, mockData3 } from '../../services/model-binder'
+
 import { blocksToChain } from '../../services/elgrapho/formatAsModel'
 
 export const getChain = async (req, res) => {
@@ -17,11 +19,9 @@ export const getChain = async (req, res) => {
   }
 
   const blocksArr = await getChainData(query)
-  const chain = blocksToChain(blocksArr, endBlock, startBlock)
-  const orphans = await getOrphans(query)
+  //const chain = blocksToChain(blocksArr, endBlock, startBlock)
+  //const orphans = await getOrphans(query)
 
-  res.json({
-    chain,
-    orphans,
-  })
+  const data = mockData3();
+  res.json(JSON.parse(data));
 }
