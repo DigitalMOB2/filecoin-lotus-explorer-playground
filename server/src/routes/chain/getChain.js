@@ -18,10 +18,13 @@ export const getChain = async (req, res) => {
     sortOrder,
   }
 
-  const blocksArr = await getChainData(query)
+  //const blocksArr = await getChainData(query)
   //const chain = blocksToChain(blocksArr, endBlock, startBlock)
   //const orphans = await getOrphans(query)
 
-  const data = mockData3();
+  let data = "{}";
+  if (cid === "0") data = mockData1();
+  if (cid === "1") data = mockData2();
+
   res.json(JSON.parse(data));
 }
