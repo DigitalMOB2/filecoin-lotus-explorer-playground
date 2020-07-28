@@ -119,8 +119,7 @@ const LaGraphaComponent = () => {
 
   useEffect(() => {
     if (!blockRange[1]) return
-    fetchGraph(dispatch, { blockRange, startDate, endDate, miner, cid: 0 })
-
+    fetchGraph(dispatch, { blockRange, startDate, endDate, miner, cid })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blockRange, startDate, endDate, miner, cid])
 
@@ -193,8 +192,8 @@ const LaGraphaComponent = () => {
         el.appendChild(tooltipTable)
       }
 
-      //window.graphInstance.fire('zoom-to-point', { zoomY, y })
-      window.graphInstance.fire('reset')
+      window.graphInstance.fire('zoom-to-point', { zoomY, y })
+      //window.graphInstance.fire('reset')
 
       window.graphInstance.on('node-click', ({ node }) => {
         selectNode(dispatch, node)
@@ -213,12 +212,12 @@ const LaGraphaComponent = () => {
             {buildingSvg && <FontAwesomeIcon icon={faCircleNotch} spin />}
             Save Graph
           </SaveGraph>
-          <LoadMore onClick={() => { loadMoreData(dispatch, chain, originalPositions, { blockRange, startDate, endDate, miner, cid: 1 }) }} >
+          <LoadMore onClick={() => { loadMoreData(dispatch, chain, originalPositions, { blockRange, startDate, endDate, miner, cid }) }} >
             Load More
           </LoadMore>
-          <ZoomPlus onClick={ () => { window.graphInstance.fire('zoom-in'); } }>+</ZoomPlus>
-          <ZoomMinus onClick={ () => { window.graphInstance.fire('zoom-out'); }}>-</ZoomMinus>
-          <ResetZoom onClick={ () => { window.graphInstance.fire('reset'); }}>Reset</ResetZoom>
+          <ZoomPlus onClick={() => { window.graphInstance.fire('zoom-in'); }}>+</ZoomPlus>
+          <ZoomMinus onClick={() => { window.graphInstance.fire('zoom-out'); }}>-</ZoomMinus>
+          <ResetZoom onClick={() => { window.graphInstance.fire('reset'); }}>Reset</ResetZoom>
         </div>
       )}
       {isNodeModalOpen && <NodeModal node={selectedNode} close={() => closeNodeModal(dispatch)} />}

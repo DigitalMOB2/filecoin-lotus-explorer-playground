@@ -36,9 +36,10 @@ export const getChainLoadMore = async (crtChainData, originalPositions, { blockR
     node.y = originalPositions[index].y;
   });
 
+
   const { chain, orphans } = mergeDataSets(crtChainData, newChainData);
-  const miners = mapMiners(chain)
-  const timeToReceive = mapTimeToReceive(chain)
+  const miners = mapMiners(chain);
+  const timeToReceive = mapTimeToReceive(chain);
 
   return {
     chain,
@@ -150,7 +151,7 @@ const mergeDataSets = (set1, set2) => {
   //remove last epoch in set 2
   let lastEpochInSet2 = 0;
   set2.chain.nodes.forEach(node => {
-    if (lastEpochInSet2 < node.height) lastEpochInSet2 = node.height;
+    if (lastEpochInSet2*1 < node.height*1) lastEpochInSet2 = node.height;
   });
 
   //rewrite using filter
@@ -201,19 +202,24 @@ const mergeDataSets = (set1, set2) => {
 
   result.chain.nodes = result.chain.nodes.concat(set2Processed.chain.nodes);
   const newNodeIndexes = {};
-  result.chain.nodes.forEach((node, index) => { newNodeIndexes[node.id] = index });
+  result.chain.nodes.forEach((node, index) => { newNodeIndexes[node.id] = index; node.x = 0 });
+
   set1Processed.chain.edges.forEach((edge, index) => {
     if (edgeNodeCID[`set1${index}`]) {
-      edge.from = newNodeIndexes[edgeNodeCID[`set1${index}`].fromId];
-      edge.to = newNodeIndexes[edgeNodeCID[`set1${index}`].toId];
-      result.chain.edges.push(edge);
+      if (newNodeIndexes[edgeNodeCID[`set1${index}`].fromId] >= 0 && newNodeIndexes[edgeNodeCID[`set1${index}`].toId] >= 0) {
+        edge.from = newNodeIndexes[edgeNodeCID[`set1${index}`].fromId];
+        edge.to = newNodeIndexes[edgeNodeCID[`set1${index}`].toId];
+        result.chain.edges.push(edge);
+      }
     }
   });
   set2Processed.chain.edges.forEach((edge, index) => {
     if (edgeNodeCID[`set2${index}`]) {
-      edge.from = newNodeIndexes[edgeNodeCID[`set2${index}`].fromId];
-      edge.to = newNodeIndexes[edgeNodeCID[`set2${index}`].toId];
-      result.chain.edges.push(edge);
+      if (newNodeIndexes[edgeNodeCID[`set2${index}`].fromId] >= 0 && newNodeIndexes[edgeNodeCID[`set2${index}`].toId] >= 0) {
+        edge.from = newNodeIndexes[edgeNodeCID[`set2${index}`].fromId];
+        edge.to = newNodeIndexes[edgeNodeCID[`set2${index}`].toId];
+        result.chain.edges.push(edge);
+      }
     }
   });
 

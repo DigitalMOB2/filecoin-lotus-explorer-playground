@@ -1,5 +1,6 @@
 import { getChain, getChainLoadMore, saveNodeOriginalPositions } from './helper'
 import { toast } from 'react-toastify'
+import { constants } from '../../utils'
 
 export const fetchGraph = async (dispatch, payload) => {
   dispatch({ type: 'CHANGE_LOADING', payload: true })
@@ -24,9 +25,15 @@ export const fetchGraph = async (dispatch, payload) => {
 
 export const loadMoreData = async (dispatch, previousChain, originalPositions, payload) => {
   dispatch({ type: 'CHANGE_LOADING', payload: true })
-  console.log(originalPositions);
   try {
-    const chain = await getChainLoadMore(previousChain, originalPositions, payload)
+    const localPayload = { ...payload, blockRange: [payload.blockRange[0], payload.blockRange[1]] };
+    localPayload.blockRange[1] = localPayload.blockRange[0];
+    localPayload.blockRange[0] = localPayload.blockRange[0] - constants.initialBlockRangeLimit;
+
+    dispatch({ type: 'CHANGE_RANGE', payload: { range: [localPayload.blockRange[0], payload.blockRange[1]] } })
+    dispatch({ type: 'CHANGE_FILTER', payload: { key: 'blockRange', value: [localPayload.blockRange[0], payload.blockRange[1]] } })
+
+    const chain = await getChainLoadMore(previousChain, originalPositions, localPayload)
 
     const newOriginalPositions = saveNodeOriginalPositions(chain);
     if (newOriginalPositions.length > 1) {
