@@ -481,6 +481,15 @@ ElGrapho.prototype = {
       that.zoomToPoint(0, y, 1, 1)
     })
 
+    this.on('zoom-to-node-fct', function(e) {
+      const { nodeY, initialPanY, zoomY } = e
+      const yDiff = 0.95 - nodeY
+      const height = window.innerHeight
+      let y = (yDiff / 2) * height * that.zoomY * that.zoomY
+      y = y - (that.panY - initialPanY * that.zoomY) * that.zoomY
+      that.zoomToPoint(0, y, 1, zoomY)
+    })
+
     this.on('select-node', function(e) {
       const { index } = e
       that.selectNode(index)
@@ -808,6 +817,7 @@ ElGrapho.prototype = {
   zoomToPoint: function(panX, panY, zoomX, zoomY) {
     Tooltip.hide()
     if (this.animations) {
+      console.log('go anim')
       this.animations = []
 
       let that = this
@@ -839,6 +849,7 @@ ElGrapho.prototype = {
         endTime: new Date().getTime() + 300,
         prop: 'panY',
       })
+      console.log(that.zoomY, zoomY)
       this.dirty = true
     } else {
       this.panX = (this.panX + panX / this.zoomX) * zoomX

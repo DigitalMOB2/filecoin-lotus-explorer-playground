@@ -96,7 +96,8 @@ const LaGraphaComponent = () => {
     // y for pan is calculated as the desired y midpoint minus the current y midpoint. the 0.95 is because have to account for 5% padding
     window.graphInstance.fire('select-node', { index })
     // @todo: update to use current zoom and adjust for position currently in graph
-    window.graphInstance.fire('zoom-to-node', { nodeY: model.nodes[index].y, initialPanY: y })
+    window.graphInstance.fire('zoom-to-node', { nodeY: model.nodes[0].y, initialPanY: y })
+    console.log('selected');
   }
 
   useEffect(() => {
@@ -156,7 +157,6 @@ const LaGraphaComponent = () => {
 
     // y for pan is calculated as the desired y midpoint minus the current y midpoint. the 0.95 is because have to account for 5% padding
     const y = (desiredInitialRange * ((height * 0.95) / numEpochsDisplayed)) / 2 - (height * 0.95) / 2
-
     const { nodes } = chain.chain
 
     if (nodes.length > 0) {
@@ -192,8 +192,11 @@ const LaGraphaComponent = () => {
         el.appendChild(tooltipTable)
       }
 
-      window.graphInstance.fire('zoom-to-point', { zoomY, y })
-      //window.graphInstance.fire('reset')
+      if (numEpochsDisplayed === desiredInitialRange){
+        window.graphInstance.fire('zoom-to-point', {y, zoomY })
+      } else {
+        window.graphInstance.fire('zoom-to-node-fct', { nodeY: window.graphInstance.model.nodes[5].y, initialPanY: y, zoomY });
+      }
 
       window.graphInstance.on('node-click', ({ node }) => {
         selectNode(dispatch, node)

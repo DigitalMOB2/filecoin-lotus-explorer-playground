@@ -28,7 +28,8 @@ export const loadMoreData = async (dispatch, previousChain, originalPositions, p
   try {
     const localPayload = { ...payload, blockRange: [payload.blockRange[0], payload.blockRange[1]] };
     localPayload.blockRange[1] = localPayload.blockRange[0];
-    localPayload.blockRange[0] = localPayload.blockRange[0] - constants.initialBlockRangeLimit;
+    const min = localPayload.blockRange[0] - constants.initialBlockRangeLimit;
+    localPayload.blockRange[0] = min < 0 ? 0 : min;
 
     dispatch({ type: 'CHANGE_RANGE', payload: { range: [localPayload.blockRange[0], payload.blockRange[1]] } })
     dispatch({ type: 'CHANGE_FILTER', payload: { key: 'blockRange', value: [localPayload.blockRange[0], payload.blockRange[1]] } })

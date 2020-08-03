@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { RangeInputs } from './range-inputs.styled'
 
 const RangeInputsComponent = ({ rangeIntervals, onChange }) => {
+  const numberOfEpochsToShow = 10;
   const [min, setMin] = useState(rangeIntervals[0])
   const [max, setMax] = useState(rangeIntervals[1])
 
@@ -24,14 +25,21 @@ const RangeInputsComponent = ({ rangeIntervals, onChange }) => {
     onChange([Number(min), Number(max)])
   }
 
+  const updateMinMax = (max) => {
+    let min = max - numberOfEpochsToShow;
+    if (min < 0) min = 0;
+    setMax(max);
+    setMin(min);
+  }
+
   return (
     <RangeInputs>
       <div>
-        <input value={min} onKeyPress={onKeyPress} onBlur={onSubmit} onChange={(e) => setMin(e.target.value)} />
+        <input value={min} />
         <span>Min</span>
       </div>
       <div>
-        <input value={max} onKeyPress={onKeyPress} onBlur={onSubmit} onChange={(e) => setMax(e.target.value)} />
+        <input value={max} onKeyPress={onKeyPress} onBlur={onSubmit} onChange={(e) => updateMinMax(e.target.value) } />
         <span>Max</span>
       </div>
     </RangeInputs>
