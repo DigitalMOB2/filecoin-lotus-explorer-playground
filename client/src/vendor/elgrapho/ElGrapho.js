@@ -6,7 +6,6 @@ const ElGraphoCollection = require('./ElGraphoCollection')
 // const Controls = require('./components/Controls/Controls')
 const Count = require('./components/Count/Count')
 const Events = require('./Events')
-const Concrete = require('concretejs')
 const _ = require('lodash')
 const Color = require('./Color')
 const Theme = require('./Theme')
@@ -101,25 +100,25 @@ ElGrapho.prototype = {
     // all Listeners we need to call remove for on cleanup
     this.allListeners = []
 
-    let viewport = (this.viewport = new Concrete.Viewport({
+    let viewport = (this.viewport = new window.Concrete.Viewport({
       container: this.wrapper,
       width: this.width,
       height: this.height,
     }))
 
-    let mainLayer = new Concrete.Layer({
+    let mainLayer = new window.Concrete.Layer({
       contextType: 'webgl',
     })
 
-    let hoverLayer = (this.hoverLayer = new Concrete.Layer({
+    let hoverLayer = (this.hoverLayer = new window.Concrete.Layer({
       contextType: '2d',
     }))
 
-    let labelsLayer = (this.labelsLayer = new Concrete.Layer({
+    let labelsLayer = (this.labelsLayer = new window.Concrete.Layer({
       contextType: '2d',
     }))
 
-    let rulerLayer = (this.rulerLayer = new Concrete.Layer({
+    let rulerLayer = (this.rulerLayer = new window.Concrete.Layer({
       contextType: '2d',
     }))
 
