@@ -1,4 +1,4 @@
-CREATE VIEW chain_visualizer_chain_data_view AS
+CREATE VIEW chain_visualiser_chain_data_view AS
 SELECT
     main_block.cid as block,
     bp.parent as parent,
@@ -9,7 +9,7 @@ SELECT
     main_block.parentstateroot,
     parent_block.timestamp as parenttimestamp,
     parent_block.height as parentheight,
-    100 as parentpower,
+    mp.raw_bytes_power as parentpower,
     synced.synced_at as syncedtimestamp,
     (SELECT COUNT(*) FROM block_messages WHERE block_messages.block = main_block.cid) AS messages
   FROM
@@ -21,7 +21,9 @@ SELECT
   LEFT JOIN
     blocks_synced synced ON synced.cid = main_block.cid
   LEFT JOIN
-    miner_sectors_heads heads ON heads.state_root = main_block.parentstateroot and heads.miner_id = parent_block.miner;
+    miner_sectors_heads heads ON heads.state_root = main_block.parentstateroot and heads.miner_id = parent_block.miner
+  LEFT JOIN
+    miner_power mp on heads.state_root = mp.state_root;
 
 CREATE VIEW chain_visualizer_orphans_view AS
  SELECT
