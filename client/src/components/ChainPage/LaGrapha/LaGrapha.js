@@ -92,9 +92,7 @@ const LaGraphaComponent = () => {
       emptyEdge: {  // required to show empty edges
         shapeId: "#emptyEdge",
         shape: (
-          <symbol viewBox="0 0 50 50" id="emptyEdge" key="0">
-            <circle cx="25" cy="25" r="8" fill="currentColor" />
-          </symbol>
+         <symbol></symbol>
         )
       }
     }
@@ -347,6 +345,8 @@ const LaGraphaComponent = () => {
           nodeTypes={NodeTypes}
           nodeSubtypes={NodeSubtypes}
           edgeTypes={EdgeTypes}
+          edgeArrowSize={-10}
+          gridDotSize={0}
           onSelectNode={() => { }}
           onCreateNode={() => { }}
           onUpdateNode={() => { }}
@@ -362,7 +362,7 @@ const LaGraphaComponent = () => {
             selected,
             hovered
           ) => {return <g>
-         <circle r="30" x={data.x} y={data.y} fill="#000"></circle>
+         <circle r="30" x={data.x} y={data.y} ></circle>
         </g>}}
         />
         </div>
