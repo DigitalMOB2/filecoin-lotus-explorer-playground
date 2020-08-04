@@ -17,6 +17,7 @@ import { LaGrapha, LaGraphaWrapper, SaveGraph, LoadMore, ZoomPlus, ZoomMinus, Re
 import { NodeModal } from './NodeModal/NodeModal'
 import { tooltip } from './tooltip'
 import { GraphView } from 'react-digraph';
+import xmlserializer from 'xmlserializer';
 
 const prepareNodes = (nodes) => {
   const tempNodes = [];
@@ -24,8 +25,8 @@ const prepareNodes = (nodes) => {
     if (node.id) {
       const tempNode = {};
       tempNode.id = node.id;
-      tempNode.title = node.id;
-      tempNode.x = node.x*1000;
+      tempNode.title = node.label;
+      tempNode.x = node.x*1500;
       tempNode.y = node.y*-1000;
       tempNode.type = 'empty';
 
@@ -78,7 +79,7 @@ const LaGraphaComponent = () => {
         shapeId: "#empty", // relates to the type property of a node
         shape: (
           <symbol viewBox="0 0 100 100" id="empty" key="0">
-            <circle cx="50" cy="50" r="45" />
+            <circle cx="50" cy="50" r="38" fill="#ff0000"/>
           </symbol>
         )
       },
@@ -214,12 +215,23 @@ const LaGraphaComponent = () => {
 
     setBuildingSvg(true);
 
-    const canvas = document.getElementsByClassName('concrete-scene-canvas')[0];
-
-    const data = canvas.toDataURL();
-    const blob = dataURItoBlob(data);
-
-    download(blob, 'graph.png', laGraphaRef.current);
+    const svgElement = (document.getElementsByClassName('graph')[0]);
+    let source = (xmlserializer.serializeToString(svgElement));
+    if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
+      source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+    }
+    if(!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)){
+      source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+    }
+    source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+    let svgBlob = new Blob([source], {type:"image/svg+xml;charset=utf-8"});
+    let svgUrl = URL.createObjectURL(svgBlob);
+    let downloadLink = document.createElement("a");
+    downloadLink.href = svgUrl;
+    downloadLink.download = "graph.svg";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
 
     setBuildingSvg(false)
   };
