@@ -1,0 +1,4 @@
+client/node_modules/*
+server/node_modules/*
+api/db/local_database_volume/*
+node_modules

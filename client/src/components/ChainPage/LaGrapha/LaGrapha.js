@@ -16,68 +16,145 @@ import { Loader } from '../../shared/Loader'
 import { LaGrapha, LaGraphaWrapper, SaveGraph, LoadMore, ZoomPlus, ZoomMinus, ResetZoom } from './la-grapha.styled'
 import { NodeModal } from './NodeModal/NodeModal'
 import { tooltip } from './tooltip'
+import { GraphView} from 'react-digraph';
+
+const prepareNodes = (nodes) => {
+  const tempNodes = [];
+  nodes.forEach( node => {
+    const tempNode = {};
+    tempNode.id = node.id;
+    tempNode.title = node.label;
+    tempNode.x = node.x;
+    tempNode.y = node.y;
+    tempNode.type = 'empty';
+
+    tempNodes.push(tempNode);
+  });
+  return tempNodes;
+};
+
+const prepareEdges = (edges, nodes) => {
+  const tempEdges = [];
+  edges.forEach( edge => {
+    const tempEdge = {};
+    tempEdge.source = nodes[edge.from].id;
+    tempEdge.target = nodes[edge.to].id;
+    tempEdge.type = 'emptyEdge';
+
+    tempEdges.push(tempEdge);
+  });
+  return tempEdges;
+};
 
 const LaGraphaComponent = () => {
-  const { state, dispatch } = useContext(store)
-  const { chain, originalPositions, loading: loadingData, filter, selectedNode, isNodeModalOpen } = state
-  const { blockRange, startDate, endDate, miner, cid, showHeightRuler } = filter
+  const { state, dispatch } = useContext(store);
+  const { chain, originalPositions, loading: loadingData, filter, selectedNode, isNodeModalOpen } = state;
+  const { blockRange, startDate, endDate, miner, cid, showHeightRuler } = filter;
 
-  const [loadingGraph, setLoading] = useState(false)
-  const [buildingSvg, setBuildingSvg] = useState(false)
+  const [loadingGraph, setLoading] = useState(false);
+  const [buildingSvg, setBuildingSvg] = useState(false);
 
-  const loading = loadingData || loadingGraph
-  const graphRendered = !!document.getElementsByClassName('concrete-scene-canvas')[0]
+  const loading = loadingData || loadingGraph;
+  const graphRendered = !!document.getElementsByClassName('concrete-scene-canvas')[0];
 
-  const laGraphaRef = useRef()
+  const laGraphaRef = useRef();
 
-  const { nodes, edges } = chain.chain
+  const { nodes, edges } = chain.chain;
+
+  const preparedNodes = prepareNodes(nodes);
+  const preparedEdges = prepareEdges(edges, nodes);
+
+  console.log(nodes);
+  console.log(preparedNodes);
+  console.log(edges);
+  console.log(preparedEdges);
+
+  const GraphConfig =  {
+    NodeTypes: {
+      empty: { // required to show empty nodes
+        typeText: "None",
+        shapeId: "#empty", // relates to the type property of a node
+        shape: (
+          <symbol viewBox="0 0 100 100" id="empty" key="0">
+            <circle cx="50" cy="50" r="45"/>
+          </symbol>
+        )
+      },
+      custom: { // required to show empty nodes
+        typeText: "Custom",
+        shapeId: "#custom", // relates to the type property of a node
+        shape: (
+          <symbol viewBox="0 0 50 25" id="custom" key="0">
+            <ellipse cx="50" cy="25" rx="50" ry="25"/>
+          </symbol>
+        )
+      }
+    },
+    NodeSubtypes: {},
+    EdgeTypes: {
+      emptyEdge: {  // required to show empty edges
+        shapeId: "#emptyEdge",
+        shape: (
+          <symbol viewBox="0 0 50 50" id="emptyEdge" key="0">
+            <circle cx="25" cy="25" r="8" fill="currentColor"/>
+          </symbol>
+        )
+      }
+    }
+  };
+
+  const NODE_KEY = "id";
+
+  const NodeTypes = GraphConfig.NodeTypes;
+  const NodeSubtypes = GraphConfig.NodeSubtypes;
+  const EdgeTypes = GraphConfig.EdgeTypes;
 
   const model = {
     nodes,
     edges,
     showRuler: showHeightRuler,
-  }
+  };
 
-  const height = window.innerHeight
-  const numEpochsDisplayed = blockRange[1] - blockRange[0]
-  const desiredInitialRange = 15
+  const height = window.innerHeight;
+  const numEpochsDisplayed = blockRange[1] - blockRange[0];
+  const desiredInitialRange = 15;
 
-  const y = (desiredInitialRange * ((height * 0.95) / numEpochsDisplayed)) / 2 - (height * 0.95) / 2
+  const y = (desiredInitialRange * ((height * 0.95) / numEpochsDisplayed)) / 2 - (height * 0.95) / 2;
 
   const onSelectMiners = (e) => {
     // can basically simulate clicking on node to see all miners, choose first node in model to have this miner to zoom to
-    const minerId = e.detail
-    const index = findLastIndex(model.nodes, { miner: minerId })
+    const minerId = e.detail;
+    const index = findLastIndex(model.nodes, { miner: minerId });
 
     if (index < 0) {
-      toast.warn('Miner not found.')
+      toast.warn('Miner not found.');
 
       return
     }
 
-    window.graphInstance.fire('select-group', { index, group: 'colors' })
+    window.graphInstance.fire('select-group', { index, group: 'colors' });
     // @todo: update to use current zoom and adjust for position currently in graph
     window.graphInstance.fire('zoom-to-node', { nodeY: model.nodes[index].y, initialPanY: y })
-  }
+  };
 
   const onSelectNode = async (e) => {
-    const cid = e.detail
-    const index = findIndex(model.nodes, { id: cid })
+    const cid = e.detail;
+    const index = findIndex(model.nodes, { id: cid });
 
     if (index < 0) {
-      let blockWithHeight
+      let blockWithHeight;
 
       try {
         blockWithHeight = await getBlockHeight({ cid })
       } catch (error) {
-        console.error('Error when fetching node', error)
-        toast.error('An error has occurred while fetching node.')
+        console.error('Error when fetching node', error);
+        toast.error('An error has occurred while fetching node.');
 
         return
       }
 
       if (!blockWithHeight) {
-        toast.error('This node was not found in our database.')
+        toast.error('This node was not found in our database.');
 
         return
       }
@@ -88,76 +165,76 @@ const LaGraphaComponent = () => {
           <br />
           Change your range to include the height of <strong>{blockWithHeight.height}</strong>.
         </div>,
-      )
+      );
 
       return
     }
 
     // y for pan is calculated as the desired y midpoint minus the current y midpoint. the 0.95 is because have to account for 5% padding
-    window.graphInstance.fire('select-node', { index })
+    window.graphInstance.fire('select-node', { index });
     // @todo: update to use current zoom and adjust for position currently in graph
-    window.graphInstance.fire('zoom-to-node', { nodeY: model.nodes[0].y, initialPanY: y })
+    window.graphInstance.fire('zoom-to-node', { nodeY: model.nodes[0].y, initialPanY: y });
     console.log('selected');
-  }
+  };
 
   useEffect(() => {
     const handleResize = debounce(() => {
       buildGraph()
-    }, 500)
+    }, 500);
 
-    // @todo: make graph acessible outside so we can remove this logic from here
+    // @todo: make graph accessible outside so we can remove this logic from here
 
-    window.addEventListener('resize', handleResize)
-    window.addEventListener('select-node', onSelectNode)
-    window.addEventListener('select-miners', onSelectMiners)
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('select-node', onSelectNode);
+    window.addEventListener('select-miners', onSelectMiners);
 
     return () => {
-      window.removeEventListener('resize', handleResize)
-      window.removeEventListener('select-node', onSelectNode)
-      window.removeEventListener('select-miners', onSelectMiners)
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('select-node', onSelectNode);
+      window.removeEventListener('select-miners', onSelectMiners);
     }
-  })
+  });
 
   useEffect(() => {
-    if (!blockRange[1]) return
+    if (!blockRange[1]) return;
     fetchGraph(dispatch, { blockRange, startDate, endDate, miner, cid })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blockRange, startDate, endDate, miner, cid])
+  }, [blockRange, startDate, endDate, miner, cid]);
 
   useEffect(() => {
     buildGraph()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chain, showHeightRuler])
+  }, [chain, showHeightRuler]);
 
   const exportGraph = () => {
-    if (buildingSvg) return
+    if (buildingSvg) return;
 
-    setBuildingSvg(true)
+    setBuildingSvg(true);
 
-    const canvas = document.getElementsByClassName('concrete-scene-canvas')[0]
+    const canvas = document.getElementsByClassName('concrete-scene-canvas')[0];
 
-    const data = canvas.toDataURL()
-    const blob = dataURItoBlob(data)
+    const data = canvas.toDataURL();
+    const blob = dataURItoBlob(data);
 
-    download(blob, 'graph.png', laGraphaRef.current)
+    download(blob, 'graph.png', laGraphaRef.current);
 
     setBuildingSvg(false)
-  }
+  };
 
   const buildGraph = () => {
-    setLoading(true)
+    setLoading(true);
 
-    const height = window.innerHeight
-    const width = window.innerWidth - 306
-    const numEpochsDisplayed = blockRange[1] - blockRange[0]
-    const desiredInitialRange = 15
+    const height = window.innerHeight;
+    const width = window.innerWidth - 306;
+    const numEpochsDisplayed = blockRange[1] - blockRange[0];
+    const desiredInitialRange = 15;
 
-    const zoomY = numEpochsDisplayed / desiredInitialRange
+    const zoomY = numEpochsDisplayed / desiredInitialRange;
 
     // y for pan is calculated as the desired y midpoint minus the current y midpoint. the 0.95 is because have to account for 5% padding
-    const y = (desiredInitialRange * ((height * 0.95) / numEpochsDisplayed)) / 2 - (height * 0.95) / 2
-    const { nodes } = chain.chain
+    const y = (desiredInitialRange * ((height * 0.95) / numEpochsDisplayed)) / 2 - (height * 0.95) / 2;
+    const { nodes } = chain.chain;
 
     if (nodes.length > 0) {
       try {
@@ -176,21 +253,21 @@ const LaGraphaComponent = () => {
           },
         })
       } catch (error) {
-        console.error('Error building graph', error)
+        console.error('Error building graph', error);
 
         setLoading(false)
       }
 
       window.graphInstance.tooltipTemplate = (index, el) => {
-        const data = nodes[index]
-        const tooltipTable = tooltip(data)
+        const data = nodes[index];
+        const tooltipTable = tooltip(data);
 
         while (el.firstChild) {
           el.removeChild(el.firstChild)
         }
 
         el.appendChild(tooltipTable)
-      }
+      };
 
       if (numEpochsDisplayed === desiredInitialRange){
         window.graphInstance.fire('zoom-to-point', {y, zoomY })
@@ -199,11 +276,11 @@ const LaGraphaComponent = () => {
       }
 
       window.graphInstance.on('node-click', ({ node }) => {
-        selectNode(dispatch, node)
+        selectNode(dispatch, node);
         openNodeModal(dispatch)
       })
     }
-  }
+  };
 
   return (
     <LaGraphaWrapper>
@@ -215,17 +292,67 @@ const LaGraphaComponent = () => {
             {buildingSvg && <FontAwesomeIcon icon={faCircleNotch} spin />}
             Save Graph
           </SaveGraph>
-          <LoadMore onClick={() => { loadMoreData(dispatch, chain, originalPositions, { blockRange, startDate, endDate, miner, cid }) }} >
+          <LoadMore
+            onClick={() => {
+              loadMoreData(dispatch, chain, originalPositions, {
+                blockRange,
+                startDate,
+                endDate,
+                miner,
+                cid,
+              });
+            }}
+          >
             Load More
           </LoadMore>
-          <ZoomPlus onClick={() => { window.graphInstance.fire('zoom-in'); }}>+</ZoomPlus>
-          <ZoomMinus onClick={() => { window.graphInstance.fire('zoom-out'); }}>-</ZoomMinus>
-          <ResetZoom onClick={() => { window.graphInstance.fire('reset'); }}>Reset</ResetZoom>
+          <ZoomPlus
+            onClick={() => {
+              window.graphInstance.fire("zoom-in");
+            }}
+          >
+            +
+          </ZoomPlus>
+          <ZoomMinus
+            onClick={() => {
+              window.graphInstance.fire("zoom-out");
+            }}
+          >
+            -
+          </ZoomMinus>
+          <ResetZoom
+            onClick={() => {
+              window.graphInstance.fire("reset");
+            }}
+          >
+            Reset
+          </ResetZoom>
         </div>
       )}
-      {isNodeModalOpen && <NodeModal node={selectedNode} close={() => closeNodeModal(dispatch)} />}
+      {nodes.length > 0 && (
+        <GraphView
+          // ref='GraphView'
+          nodeKey={NODE_KEY}
+          nodes={preparedNodes}
+          edges={preparedEdges}
+          selected={null}
+          nodeTypes={NodeTypes}
+          nodeSubtypes={NodeSubtypes}
+          edgeTypes={EdgeTypes}
+          onSelectNode={() => {}}
+          onCreateNode={() => {}}
+          onUpdateNode={() => {}}
+          onDeleteNode={() => {}}
+          onSelectEdge={() => {}}
+          onCreateEdge={() => {}}
+          onSwapEdge={() => {}}
+          onDeleteEdge={() => {}}
+        />
+      )}
+      {isNodeModalOpen && (
+        <NodeModal node={selectedNode} close={() => closeNodeModal(dispatch)} />
+      )}
     </LaGraphaWrapper>
-  )
-}
+  );
+};
 
 export { LaGraphaComponent as LaGrapha }
