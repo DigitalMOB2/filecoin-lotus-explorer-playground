@@ -96,8 +96,7 @@ const LaGraphaComponent = () => {
     // y for pan is calculated as the desired y midpoint minus the current y midpoint. the 0.95 is because have to account for 5% padding
     window.graphInstance.fire('select-node', { index })
     // @todo: update to use current zoom and adjust for position currently in graph
-    window.graphInstance.fire('zoom-to-node', { nodeY: model.nodes[0].y, initialPanY: y })
-    console.log('selected');
+    window.graphInstance.fire('zoom-to-node', { nodeY: model.nodes[index].y, initialPanY: y })
   }
 
   useEffect(() => {
