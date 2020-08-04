@@ -18,6 +18,25 @@ import { tooltip } from './tooltip'
 import { GraphView } from 'react-digraph';
 import xmlserializer from 'xmlserializer';
 
+
+const getGlowColor = (node) => {
+  const colorsArray = ['#3366CC', '#DC3912', '#FF9900', '#109618',
+    '#990099', '#3B3EAC', '#0099C6', '#DD4477'];
+  return colorsArray[node.tipset % 8];
+};
+
+const getOutlineColor = (node) => {
+  const colorsArray = ['#3c3c3c', '#109618', '#990099', '#FF9900',
+    '#DC3912'];
+  return colorsArray[node.weirdTime % 5];
+};
+
+const getMinerColor = (node) => {
+  const colorsArray = ['#3366CC', '#DC3912', '#FF9900', '#109618',
+    '#990099', '#3B3EAC', '#0099C6', '#DD4477'];
+  return colorsArray[node.minerColor % 8];
+};
+
 const prepareNodes = (nodes) => {
   const tempNodes = [];
   nodes.forEach(node => {
@@ -28,6 +47,9 @@ const prepareNodes = (nodes) => {
       tempNode.x = node.x*1500;
       tempNode.y = node.y*-1000;
       tempNode.type = 'empty';
+      tempNode.weirdTime = node.weirdTime;
+      tempNode.minerColor = node.minerColor;
+      tempNode.tipset = node.tipset;
 
       tempNodes.push(tempNode);
     }
@@ -63,6 +85,8 @@ const LaGraphaComponent = () => {
 
   const { nodes, edges } = chain.chain;
 
+  console.log(nodes);
+
   const preparedNodes = prepareNodes(nodes);
   const preparedEdges = prepareEdges(edges, nodes);
 
@@ -92,7 +116,7 @@ const LaGraphaComponent = () => {
       emptyEdge: {  // required to show empty edges
         shapeId: "#emptyEdge",
         shape: (
-         <symbol></symbol>
+         <symbol/>
         )
       }
     }
@@ -358,11 +382,10 @@ const LaGraphaComponent = () => {
           renderNode =  {(
             nodeRef,
             data,
-            index,
-            selected,
-            hovered
           ) => {return <g>
-         <circle r="30" x={data.x} y={data.y} ></circle>
+          <circle r="38" x={data.x} y={data.y} fill={getGlowColor(data)} fillOpacity={0.6}/>
+          <circle r="14" x={data.x} y={data.y} fill={getOutlineColor(data)} fillOpacity={1}/>
+          <circle r="10" x={data.x} y={data.y} fill={getMinerColor(data)} fillOpacity={1}/>
         </g>}}
         />
         </div>
