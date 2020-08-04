@@ -66,11 +66,6 @@ const LaGraphaComponent = () => {
   const preparedNodes = prepareNodes(nodes);
   const preparedEdges = prepareEdges(edges, nodes);
 
-  console.log(nodes);
-  console.log(preparedNodes);
-  console.log(edges);
-  console.log(preparedEdges);
-
   const GraphConfig = {
     NodeTypes: {
       empty: { // required to show empty nodes
@@ -360,6 +355,15 @@ const LaGraphaComponent = () => {
           onCreateEdge={() => { }}
           onSwapEdge={() => { }}
           onDeleteEdge={() => { }}
+          renderNode =  {(
+            nodeRef,
+            data,
+            index,
+            selected,
+            hovered
+          ) => {return <g>
+         <circle r="30" x={data.x} y={data.y} fill="#000"></circle>
+        </g>}}
         />
         </div>
       )}
