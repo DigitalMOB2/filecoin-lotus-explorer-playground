@@ -16,26 +16,28 @@ import { Loader } from '../../shared/Loader'
 import { LaGrapha, LaGraphaWrapper, SaveGraph, LoadMore, ZoomPlus, ZoomMinus, ResetZoom } from './la-grapha.styled'
 import { NodeModal } from './NodeModal/NodeModal'
 import { tooltip } from './tooltip'
-import { GraphView} from 'react-digraph';
+import { GraphView } from 'react-digraph';
 
 const prepareNodes = (nodes) => {
   const tempNodes = [];
-  nodes.forEach( node => {
-    const tempNode = {};
-    tempNode.id = node.id;
-    tempNode.title = node.label;
-    tempNode.x = node.x;
-    tempNode.y = node.y;
-    tempNode.type = 'empty';
+  nodes.forEach(node => {
+    if (node.id) {
+      const tempNode = {};
+      tempNode.id = node.id;
+      tempNode.title = node.id;
+      tempNode.x = node.x*1000;
+      tempNode.y = node.y*-1000;
+      tempNode.type = 'empty';
 
-    tempNodes.push(tempNode);
+      tempNodes.push(tempNode);
+    }
   });
   return tempNodes;
 };
 
 const prepareEdges = (edges, nodes) => {
   const tempEdges = [];
-  edges.forEach( edge => {
+  edges.forEach(edge => {
     const tempEdge = {};
     tempEdge.source = nodes[edge.from].id;
     tempEdge.target = nodes[edge.to].id;
@@ -69,14 +71,14 @@ const LaGraphaComponent = () => {
   console.log(edges);
   console.log(preparedEdges);
 
-  const GraphConfig =  {
+  const GraphConfig = {
     NodeTypes: {
       empty: { // required to show empty nodes
         typeText: "None",
         shapeId: "#empty", // relates to the type property of a node
         shape: (
           <symbol viewBox="0 0 100 100" id="empty" key="0">
-            <circle cx="50" cy="50" r="45"/>
+            <circle cx="50" cy="50" r="45" />
           </symbol>
         )
       },
@@ -85,7 +87,7 @@ const LaGraphaComponent = () => {
         shapeId: "#custom", // relates to the type property of a node
         shape: (
           <symbol viewBox="0 0 50 25" id="custom" key="0">
-            <ellipse cx="50" cy="25" rx="50" ry="25"/>
+            <ellipse cx="50" cy="25" rx="50" ry="25" />
           </symbol>
         )
       }
@@ -96,7 +98,7 @@ const LaGraphaComponent = () => {
         shapeId: "#emptyEdge",
         shape: (
           <symbol viewBox="0 0 50 50" id="emptyEdge" key="0">
-            <circle cx="25" cy="25" r="8" fill="currentColor"/>
+            <circle cx="25" cy="25" r="8" fill="currentColor" />
           </symbol>
         )
       }
@@ -269,8 +271,8 @@ const LaGraphaComponent = () => {
         el.appendChild(tooltipTable)
       };
 
-      if (numEpochsDisplayed === desiredInitialRange){
-        window.graphInstance.fire('zoom-to-point', {y, zoomY })
+      if (numEpochsDisplayed === desiredInitialRange) {
+        window.graphInstance.fire('zoom-to-point', { y, zoomY })
       } else {
         window.graphInstance.fire('zoom-to-node-fct', { nodeY: window.graphInstance.model.nodes[5].y, initialPanY: y, zoomY });
       }
@@ -329,6 +331,7 @@ const LaGraphaComponent = () => {
         </div>
       )}
       {nodes.length > 0 && (
+        <div style={{width: "50%"}}>
         <GraphView
           // ref='GraphView'
           nodeKey={NODE_KEY}
@@ -338,15 +341,16 @@ const LaGraphaComponent = () => {
           nodeTypes={NodeTypes}
           nodeSubtypes={NodeSubtypes}
           edgeTypes={EdgeTypes}
-          onSelectNode={() => {}}
-          onCreateNode={() => {}}
-          onUpdateNode={() => {}}
-          onDeleteNode={() => {}}
-          onSelectEdge={() => {}}
-          onCreateEdge={() => {}}
-          onSwapEdge={() => {}}
-          onDeleteEdge={() => {}}
+          onSelectNode={() => { }}
+          onCreateNode={() => { }}
+          onUpdateNode={() => { }}
+          onDeleteNode={() => { }}
+          onSelectEdge={() => { }}
+          onCreateEdge={() => { }}
+          onSwapEdge={() => { }}
+          onDeleteEdge={() => { }}
         />
+        </div>
       )}
       {isNodeModalOpen && (
         <NodeModal node={selectedNode} close={() => closeNodeModal(dispatch)} />
