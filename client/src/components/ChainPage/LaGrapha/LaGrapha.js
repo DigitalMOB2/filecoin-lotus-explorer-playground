@@ -312,6 +312,9 @@ const LaGraphaComponent = () => {
     }
   };
 
+  window.d3.selectAll('.background').attr('fill', 'black');
+
+
   return (
     <LaGraphaWrapper>
       {loading && <Loader light={graphRendered} />}
@@ -382,11 +385,20 @@ const LaGraphaComponent = () => {
           renderNode =  {(
             nodeRef,
             data,
-          ) => {return <g>
-          <circle r="38" x={data.x} y={data.y} fill={getGlowColor(data)} fillOpacity={0.6}/>
-          <circle r="14" x={data.x} y={data.y} fill={getOutlineColor(data)} fillOpacity={1}/>
-          <circle r="10" x={data.x} y={data.y} fill={getMinerColor(data)} fillOpacity={1}/>
-        </g>}}
+          ) => {
+            if (data.title === 'skipped') {
+              return <g>
+                <circle r="10" x={data.x} y={data.y} fill="white" fillOpacity={1}/>
+              </g>
+            }
+            return <g>
+              <circle r="38" x={data.x} y={data.y} fill={getGlowColor(data)} fillOpacity={0.4}/>
+              <circle r="14" x={data.x} y={data.y} fill={getOutlineColor(data)} fillOpacity={1}/>
+              <circle r="10" x={data.x} y={data.y} fill={getMinerColor(data)} fillOpacity={1}/>
+            </g>}}
+          afterRenderEdge={() =>{
+            window.d3.selectAll('.edge-path').attr('stroke', '#373737');
+          }}
         />
         </div>
       )}
