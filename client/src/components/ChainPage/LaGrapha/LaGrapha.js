@@ -44,12 +44,13 @@ const prepareNodes = (nodes) => {
       const tempNode = {};
       tempNode.id = node.id;
       tempNode.title = node.label;
-      tempNode.x = node.x*1500;
-      tempNode.y = node.y*-1000;
+      tempNode.x = node.x * 1500;
+      tempNode.y = node.y * -1000;
       tempNode.type = 'empty';
       tempNode.weirdTime = node.weirdTime;
       tempNode.minerColor = node.minerColor;
       tempNode.tipset = node.tipset;
+      tempNode.height = node.height;
 
       tempNodes.push(tempNode);
     }
@@ -85,10 +86,10 @@ const LaGraphaComponent = () => {
 
   const { nodes, edges } = chain.chain;
 
-  console.log(nodes);
-
   const preparedNodes = prepareNodes(nodes);
   const preparedEdges = prepareEdges(edges, nodes);
+
+  console.log(preparedNodes);
 
   const GraphConfig = {
     NodeTypes: {
@@ -123,6 +124,11 @@ const LaGraphaComponent = () => {
   };
 
   const NODE_KEY = "id";
+  let RULER_ADDED = false;
+  let maxXcoord = 0;
+  let minXcoord = 0;
+  let maxYcoord = 0;
+  let minYcoord = 0;
 
   const NodeTypes = GraphConfig.NodeTypes;
   const NodeSubtypes = GraphConfig.NodeSubtypes;
@@ -230,6 +236,13 @@ const LaGraphaComponent = () => {
     if (buildingSvg) return;
 
     setBuildingSvg(true);
+
+    const transformString = (window.d3.selectAll('.view')['_groups'][0][0]['transform']['baseVal'][1]['matrix']['a']);
+
+    window.d3.selectAll('.background').attr('x', -Math.abs(maxXcoord) - Math.abs(minYcoord) + 500)
+      .attr('y', -Math.abs(minYcoord) - Math.abs(maxYcoord))
+      .attr('width', (Math.abs(minXcoord) + Math.abs(maxXcoord)) / transformString - 2200)
+      .attr('height', (Math.abs(minYcoord) + Math.abs(maxYcoord)) / transformString - 1000);
 
     const svgElement = (document.getElementsByClassName('graph')[0]);
     let source = (xmlserializer.serializeToString(svgElement));
@@ -356,6 +369,40 @@ const LaGraphaComponent = () => {
               window.d3.selectAll('.edge-path').attr('stroke', '#373737');
               window.d3.selectAll('.node-text').attr("transform", "translate(0, -36)");
               window.d3.selectAll('.node-text').attr("fill", "white");
+
+              if(!RULER_ADDED) {
+
+                let blockHeights = {};
+
+                preparedNodes.forEach(node => {
+                  if (maxXcoord < node.x) {
+                    maxXcoord = node.x;
+                  }
+                  if (minXcoord > node.x) {
+                    minXcoord = node.x;
+                  }
+                  if (maxYcoord < node.y) {
+                    maxYcoord = node.y;
+                  }
+                  if (minYcoord > node.y) {
+                    minYcoord = node.y;
+                  }
+                  blockHeights[node.height] = node.y;
+                });
+                console.log(maxXcoord, blockHeights);
+
+                Object.keys(blockHeights).forEach(key => {
+                  window.d3.selectAll('.view').append('text')
+                    .attr('fill', 'white')
+                    .attr('fontSize', 10)
+                    .text(key)
+                    .attr('x', maxXcoord + 80)
+                    .attr('y', blockHeights[key])
+                    .attr('class', 'ruler')
+                });
+
+                RULER_ADDED = true;
+              }
 
             }}
           />
