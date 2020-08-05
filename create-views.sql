@@ -21,9 +21,7 @@ SELECT
   LEFT JOIN
     blocks_synced synced ON synced.cid = main_block.cid
   LEFT JOIN
-    miner_sectors_heads heads ON heads.state_root = main_block.parentstateroot and heads.miner_id = parent_block.miner
-  LEFT JOIN
-    miner_power mp on heads.state_root = mp.state_root;
+    miner_power mp on main_block.parentstateroot = mp.state_root;
 
 CREATE VIEW chain_visualizer_orphans_view AS
  SELECT
