@@ -1,5 +1,6 @@
 import { data as data1 } from './data1';
 import { data as data2 } from './data2';
+import { chain } from '../../routes/chain';
 
 export const mockData1 = () => {
     return data1;
@@ -76,6 +77,14 @@ const mergeDataSets = (set1, set2) => {
         },
         orphans: set1Processed.orphans.concat(set2Processed.orphans)
     };
+
+    Object.keys(set2Processed.chain.miners).forEach ( minerId => {
+        if (result.chain.miners[minerId]) {
+            result.chain.miners[minerId] += set2Processed.chain.miners[minerId];
+        } else {
+            result.chain.miners[minerId] = set2Processed.chain.miners[minerId];
+        }
+    });
 
     result.chain.nodes = result.chain.nodes.concat(set2Processed.chain.nodes);
     const newNodeIndexes = {};

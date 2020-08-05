@@ -200,6 +200,14 @@ const mergeDataSets = (set1, set2) => {
     orphans: set1Processed.orphans.concat(set2Processed.orphans)
   };
 
+  Object.keys(set2Processed.chain.miners).forEach ( minerId => {
+    if (result.chain.miners[minerId]) {
+        result.chain.miners[minerId] += set2Processed.chain.miners[minerId];
+    } else {
+        result.chain.miners[minerId] = set2Processed.chain.miners[minerId];
+    }
+  });
+
   result.chain.nodes = result.chain.nodes.concat(set2Processed.chain.nodes);
   const newNodeIndexes = {};
   result.chain.nodes.forEach((node, index) => { newNodeIndexes[node.id] = index; node.x = 0 });
