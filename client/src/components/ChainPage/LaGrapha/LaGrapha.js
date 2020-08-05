@@ -93,7 +93,7 @@ const LaGraphaComponent = () => {
   const GraphConfig = {
     NodeTypes: {
       empty: { // required to show empty nodes
-        typeText: "None",
+        typeText: "",
         shapeId: "#empty", // relates to the type property of a node
         shape: (
           <symbol viewBox="0 0 100 100" id="empty" key="0">
@@ -313,99 +313,104 @@ const LaGraphaComponent = () => {
   };
 
   window.d3.selectAll('.background').attr('fill', 'black');
+  window.d3.selectAll('.node-text').attr('color', 'white');
 
 
   return (
-    <LaGraphaWrapper>
-      {loading && <Loader light={graphRendered} />}
-      <LaGrapha ref={laGraphaRef} />
-      {!loading && (
-        <div>
-          <SaveGraph disabled={buildingSvg} onClick={exportGraph}>
-            {buildingSvg && <FontAwesomeIcon icon={faCircleNotch} spin />}
-            Save Graph
-          </SaveGraph>
-          <LoadMore
-            onClick={() => {
-              loadMoreData(dispatch, chain, originalPositions, {
-                blockRange,
-                startDate,
-                endDate,
-                miner,
-                cid,
-              });
-            }}
-          >
-            Load More
-          </LoadMore>
-          <ZoomPlus
-            onClick={() => {
-              window.graphInstance.fire("zoom-in");
-            }}
-          >
-            +
-          </ZoomPlus>
-          <ZoomMinus
-            onClick={() => {
-              window.graphInstance.fire("zoom-out");
-            }}
-          >
-            -
-          </ZoomMinus>
-          <ResetZoom
-            onClick={() => {
-              window.graphInstance.fire("reset");
-            }}
-          >
-            Reset
-          </ResetZoom>
-        </div>
-      )}
+    <div>
       {nodes.length > 0 && (
-        <div style={{width: "50%"}}>
-        <GraphView
-          // ref='GraphView'
-          nodeKey={NODE_KEY}
-          nodes={preparedNodes}
-          edges={preparedEdges}
-          selected={null}
-          nodeTypes={NodeTypes}
-          nodeSubtypes={NodeSubtypes}
-          edgeTypes={EdgeTypes}
-          edgeArrowSize={-10}
-          gridDotSize={0}
-          onSelectNode={() => { }}
-          onCreateNode={() => { }}
-          onUpdateNode={() => { }}
-          onDeleteNode={() => { }}
-          onSelectEdge={() => { }}
-          onCreateEdge={() => { }}
-          onSwapEdge={() => { }}
-          onDeleteEdge={() => { }}
-          renderNode =  {(
-            nodeRef,
-            data,
-          ) => {
-            if (data.title === 'skipped') {
+        <div style={{width: "100%", position: 'absolute', height: '100%', zIndex: -1}}>
+          <GraphView
+            nodeKey={NODE_KEY}
+            nodes={preparedNodes}
+            edges={preparedEdges}
+            selected={null}
+            nodeTypes={NodeTypes}
+            nodeSubtypes={NodeSubtypes}
+            edgeTypes={EdgeTypes}
+            edgeArrowSize={-10}
+            gridDotSize={0}
+            onSelectNode={() => { }}
+            onCreateNode={() => { }}
+            onUpdateNode={() => { }}
+            onDeleteNode={() => { }}
+            onSelectEdge={() => { }}
+            onCreateEdge={() => { }}
+            onSwapEdge={() => { }}
+            onDeleteEdge={() => { }}
+            renderNode={(
+              nodeRef,
+              data,
+            ) => {
+              if (data.title === 'skipped') {
+                return <g>
+                  <circle r="10" x={data.x} y={data.y} fill="white" fillOpacity={1}/>
+                </g>
+              }
               return <g>
-                <circle r="10" x={data.x} y={data.y} fill="white" fillOpacity={1}/>
-              </g>
-            }
-            return <g>
-              <circle r="38" x={data.x} y={data.y} fill={getGlowColor(data)} fillOpacity={0.4}/>
-              <circle r="14" x={data.x} y={data.y} fill={getOutlineColor(data)} fillOpacity={1}/>
-              <circle r="10" x={data.x} y={data.y} fill={getMinerColor(data)} fillOpacity={1}/>
-            </g>}}
-          afterRenderEdge={() =>{
-            window.d3.selectAll('.edge-path').attr('stroke', '#373737');
-          }}
-        />
+                <circle r="38" x={data.x} y={data.y} fill={getGlowColor(data)} fillOpacity={0.4}/>
+                <circle r="14" x={data.x} y={data.y} fill={getOutlineColor(data)} fillOpacity={1}/>
+                <circle r="10" x={data.x} y={data.y} fill={getMinerColor(data)} fillOpacity={1}/>
+              </g>}}
+            afterRenderEdge={() =>{
+              window.d3.selectAll('.edge-path').attr('stroke', '#373737');
+              window.d3.selectAll('.node-text').attr("transform", "translate(0, -36)");
+              window.d3.selectAll('.node-text').attr("fill", "white");
+
+            }}
+          />
         </div>
       )}
-      {isNodeModalOpen && (
-        <NodeModal node={selectedNode} close={() => closeNodeModal(dispatch)} />
-      )}
-    </LaGraphaWrapper>
+      <LaGraphaWrapper>
+        {loading && <Loader light={graphRendered} />}
+        <LaGrapha ref={laGraphaRef} />
+        {!loading && (
+          <div>
+            <SaveGraph disabled={buildingSvg} onClick={exportGraph}>
+              {buildingSvg && <FontAwesomeIcon icon={faCircleNotch} spin />}
+              Save Graph
+            </SaveGraph>
+            <LoadMore
+              onClick={() => {
+                loadMoreData(dispatch, chain, originalPositions, {
+                  blockRange,
+                  startDate,
+                  endDate,
+                  miner,
+                  cid,
+                });
+              }}
+            >
+              Load More
+            </LoadMore>
+            <ZoomPlus
+              onClick={() => {
+                window.graphInstance.fire("zoom-in");
+              }}
+            >
+              +
+            </ZoomPlus>
+            <ZoomMinus
+              onClick={() => {
+                window.graphInstance.fire("zoom-out");
+              }}
+            >
+              -
+            </ZoomMinus>
+            <ResetZoom
+              onClick={() => {
+                window.graphInstance.fire("reset");
+              }}
+            >
+              Reset
+            </ResetZoom>
+          </div>
+        )}
+        {isNodeModalOpen && (
+          <NodeModal node={selectedNode} close={() => closeNodeModal(dispatch)} />
+        )}
+      </LaGraphaWrapper>
+    </div>
   );
 };
 
