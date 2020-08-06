@@ -84,6 +84,11 @@ const StateProvider = ({ children }) => {
           ...state,
           loading: action.payload,
         }
+      case 'STORE_ORIGINAL_POSITIONS':
+        return {
+          ...state,
+          originalPositions: action.payload,
+        }
       case 'CHANGE_CHAIN':
         return {
           ...state,

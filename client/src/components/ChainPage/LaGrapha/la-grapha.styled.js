@@ -19,6 +19,7 @@ export const LaGrapha = styled.div`
 
 export const SaveGraph = styled.button`
   background-color: #ffffff;
+  width: 108px;
   color: #212121;
   font-weight: 600;
   font-size: 12px;
@@ -31,6 +32,136 @@ export const SaveGraph = styled.button`
   padding: 8px 18px;
   z-index: 200;
   top: 16px;
+  left: 16px;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: default;
+    background-color: #212121;
+    color: #e9e9e9;
+  }
+
+  svg {
+    margin-right: 5px;
+  }
+`
+
+export const LoadMore = styled.button`
+  background-color: #ffffff;
+  width: 108px;
+  color: #212121;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 14px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  border: 1px solid #d7d7d7;
+  outline: none;
+  position: absolute;
+  padding: 8px 18px;
+  z-index: 200;
+  top: 50px;
+  left: 16px;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: default;
+    background-color: #212121;
+    color: #e9e9e9;
+  }
+
+  svg {
+    margin-right: 5px;
+  }
+`
+
+export const ZoomPlus = styled.button`
+  background-color: #ffffff;
+  color: #212121;
+  width: 50px;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 14px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  border: 1px solid #d7d7d7;
+  outline: none;
+  position: absolute;
+  padding: 8px 18px;
+  z-index: 200;
+  top: 84px;
+  left: 16px;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: default;
+    background-color: #212121;
+    color: #e9e9e9;
+  }
+
+  svg {
+    margin-right: 5px;
+  }
+`
+export const ZoomMinus = styled.button`
+  background-color: #ffffff;
+  color: #212121;
+  width: 50px;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 14px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  border: 1px solid #d7d7d7;
+  outline: none;
+  position: absolute;
+  padding: 8px 18px;
+  z-index: 200;
+  top: 84px;
+  left: 74px;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: default;
+    background-color: #212121;
+    color: #e9e9e9;
+  }
+
+  svg {
+    margin-right: 5px;
+  }
+`
+export const ResetZoom = styled.button`
+  background-color: #ffffff;
+  width: 108px;
+  color: #212121;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 14px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  border: 1px solid #d7d7d7;
+  outline: none;
+  position: absolute;
+  padding: 8px 18px;
+  z-index: 200;
+  top: 118px;
   left: 16px;
 
   &:hover {

@@ -6,20 +6,20 @@ import findLastIndex from 'lodash/findLastIndex'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import { getBlockHeight } from '../../../api'
-import { fetchGraph } from '../../../context/chain/actions'
+import { fetchGraph, loadMoreData } from '../../../context/chain/actions'
 import { closeNodeModal, openNodeModal } from '../../../context/node-modal/actions'
 import { selectNode } from '../../../context/selected-node/actions'
 import { store } from '../../../context/store'
 import { dataURItoBlob, download } from '../../../utils/download'
 import ElGrapho from '../../../vendor/elgrapho/ElGrapho'
 import { Loader } from '../../shared/Loader'
-import { LaGrapha, LaGraphaWrapper, SaveGraph } from './la-grapha.styled'
+import { LaGrapha, LaGraphaWrapper, SaveGraph, LoadMore, ZoomPlus, ZoomMinus, ResetZoom } from './la-grapha.styled'
 import { NodeModal } from './NodeModal/NodeModal'
 import { tooltip } from './tooltip'
 
 const LaGraphaComponent = () => {
   const { state, dispatch } = useContext(store)
-  const { chain, loading: loadingData, filter, selectedNode, isNodeModalOpen } = state
+  const { chain, originalPositions, loading: loadingData, filter, selectedNode, isNodeModalOpen } = state
   const { blockRange, startDate, endDate, miner, cid, showHeightRuler } = filter
 
   const [loadingGraph, setLoading] = useState(false)
@@ -120,7 +120,6 @@ const LaGraphaComponent = () => {
   useEffect(() => {
     if (!blockRange[1]) return
     fetchGraph(dispatch, { blockRange, startDate, endDate, miner, cid })
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blockRange, startDate, endDate, miner, cid])
 
@@ -157,7 +156,6 @@ const LaGraphaComponent = () => {
 
     // y for pan is calculated as the desired y midpoint minus the current y midpoint. the 0.95 is because have to account for 5% padding
     const y = (desiredInitialRange * ((height * 0.95) / numEpochsDisplayed)) / 2 - (height * 0.95) / 2
-
     const { nodes } = chain.chain
 
     if (nodes.length > 0) {
@@ -193,7 +191,11 @@ const LaGraphaComponent = () => {
         el.appendChild(tooltipTable)
       }
 
-      window.graphInstance.fire('zoom-to-point', { zoomY, y })
+      if (numEpochsDisplayed === desiredInitialRange){
+        window.graphInstance.fire('zoom-to-point', {y, zoomY })
+      } else {
+        window.graphInstance.fire('zoom-to-node-fct', { nodeY: window.graphInstance.model.nodes[5].y, initialPanY: y, zoomY });
+      }
 
       window.graphInstance.on('node-click', ({ node }) => {
         selectNode(dispatch, node)
@@ -207,10 +209,18 @@ const LaGraphaComponent = () => {
       {loading && <Loader light={graphRendered} />}
       <LaGrapha ref={laGraphaRef} />
       {!loading && (
-        <SaveGraph disabled={buildingSvg} onClick={exportGraph}>
-          {buildingSvg && <FontAwesomeIcon icon={faCircleNotch} spin />}
-          Save Graph
-        </SaveGraph>
+        <div>
+          <SaveGraph disabled={buildingSvg} onClick={exportGraph}>
+            {buildingSvg && <FontAwesomeIcon icon={faCircleNotch} spin />}
+            Save Graph
+          </SaveGraph>
+          <LoadMore onClick={() => { loadMoreData(dispatch, chain, originalPositions, { blockRange, startDate, endDate, miner, cid }) }} >
+            Load More
+          </LoadMore>
+          <ZoomPlus onClick={() => { window.graphInstance.fire('zoom-in'); }}>+</ZoomPlus>
+          <ZoomMinus onClick={() => { window.graphInstance.fire('zoom-out'); }}>-</ZoomMinus>
+          <ResetZoom onClick={() => { window.graphInstance.fire('reset'); }}>Reset</ResetZoom>
+        </div>
       )}
       {isNodeModalOpen && <NodeModal node={selectedNode} close={() => closeNodeModal(dispatch)} />}
     </LaGraphaWrapper>
