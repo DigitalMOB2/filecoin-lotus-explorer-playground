@@ -191,7 +191,7 @@ const LaGraphaComponent = () => {
         el.appendChild(tooltipTable)
       }
 
-      if (numEpochsDisplayed === desiredInitialRange){
+      if (numEpochsDisplayed === 120){
         window.graphInstance.fire('zoom-to-point', {y, zoomY })
       } else {
         window.graphInstance.fire('zoom-to-node-fct', { nodeY: window.graphInstance.model.nodes[5].y, initialPanY: y, zoomY });
