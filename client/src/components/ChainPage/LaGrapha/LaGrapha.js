@@ -143,16 +143,17 @@ const LaGraphaComponent = () => {
   }
 
   const maximizeGraph = () => {
-    setLoading(true)
+    setLoading(true);
 
     const numEpochsDisplayed = blockRange[1] - blockRange[0];
+    const desiredInitialRange = 15;
 
     width =  window.innerWidth - 306;
     // height = numEpochsDisplayed * 200;
-    height = window.innerHeight * 2;
+    height = window.innerHeight * Math.ceil(numEpochsDisplayed / desiredInitialRange);
 
     console.log(numEpochsDisplayed);
-    // const desiredInitialRange = 15
+
 
     // const zoomY = numEpochsDisplayed / desiredInitialRange
 
