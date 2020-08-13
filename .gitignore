@@ -1,2 +1,6 @@
 
 init.sql
+api/db/
+node_modules/
+server/node_modules
+client/node_modules

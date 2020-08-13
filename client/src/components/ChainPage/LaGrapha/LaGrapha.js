@@ -38,7 +38,9 @@ const LaGraphaComponent = () => {
     showRuler: showHeightRuler,
   }
 
-  const height = window.innerHeight
+  let height = window.innerHeight;
+  let width = window.innerWidth - 306;
+
   const numEpochsDisplayed = blockRange[1] - blockRange[0]
   const desiredInitialRange = 15
 
@@ -134,21 +136,92 @@ const LaGraphaComponent = () => {
 
     setBuildingSvg(true)
 
-    const canvas = document.getElementsByClassName('concrete-scene-canvas')[0]
+    maximizeGraph();
 
-    const data = canvas.toDataURL()
-    const blob = dataURItoBlob(data)
-
-    download(blob, 'graph.png', laGraphaRef.current)
 
     setBuildingSvg(false)
+  }
+
+  const maximizeGraph = () => {
+    setLoading(true)
+
+    const numEpochsDisplayed = blockRange[1] - blockRange[0];
+
+    width =  window.innerWidth - 306;
+    // height = numEpochsDisplayed * 200;
+    height = window.innerHeight * 2;
+
+    console.log(numEpochsDisplayed);
+    // const desiredInitialRange = 15
+
+    // const zoomY = numEpochsDisplayed / desiredInitialRange
+
+    // y for pan is calculated as the desired y midpoint minus the current y midpoint. the 0.95 is because have to account for 5% padding
+    // const y = (desiredInitialRange * ((height * 0.95) / numEpochsDisplayed)) / 2 - (height * 0.95) / 2
+    const { nodes } = chain.chain
+
+    if (nodes.length > 0) {
+      try {
+        window.graphInstance = new ElGrapho({
+          container: laGraphaRef.current,
+          model,
+          labelSize: 0.5,
+          height,
+          width,
+          edgeSize: 0.3,
+          nodeSize: 1,
+          nodeOutline: false,
+          darkMode: 1,
+          callback: () => {
+            setLoading(false);
+            setTimeout(() => {
+              const canvas = document.getElementsByClassName('concrete-scene-canvas')[0];
+
+            const data = canvas.toDataURL();
+            const blob = dataURItoBlob(data);
+
+            console.log(data);
+
+            download(blob, 'graph.png', laGraphaRef.current);
+            }, 5000)
+
+          },
+        })
+      } catch (error) {
+        console.error('Error building graph', error);
+
+        setLoading(false)
+      }
+
+      window.graphInstance.tooltipTemplate = (index, el) => {
+        const data = nodes[index]
+        const tooltipTable = tooltip(data)
+
+        while (el.firstChild) {
+          el.removeChild(el.firstChild)
+        }
+
+        el.appendChild(tooltipTable)
+      }
+
+      window.graphInstance.fire('reset');
+
+      // if (numEpochsDisplayed === desiredInitialRange){
+      //   window.graphInstance.fire('zoom-to-point', {y, zoomY })
+      // } else {
+      //   window.graphInstance.fire('zoom-to-node-fct', { nodeY: window.graphInstance.model.nodes[5].y, initialPanY: y, zoomY });
+      // }
+
+      window.graphInstance.on('node-click', ({ node }) => {
+        selectNode(dispatch, node)
+        openNodeModal(dispatch)
+      })
+    }
   }
 
   const buildGraph = () => {
     setLoading(true)
 
-    const height = window.innerHeight
-    const width = window.innerWidth - 306
     const numEpochsDisplayed = blockRange[1] - blockRange[0]
     const desiredInitialRange = 15
 
