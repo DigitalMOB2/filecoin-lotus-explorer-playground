@@ -16,6 +16,7 @@ import { Loader } from '../../shared/Loader'
 import { LaGrapha, LaGraphaWrapper, SaveGraph, LoadMore, ZoomPlus, ZoomMinus, ResetZoom } from './la-grapha.styled'
 import { NodeModal } from './NodeModal/NodeModal'
 import { tooltip } from './tooltip'
+import { constants } from '../../../utils'
 
 const LaGraphaComponent = () => {
   const { state, dispatch } = useContext(store)
@@ -118,7 +119,9 @@ const LaGraphaComponent = () => {
   })
 
   useEffect(() => {
-    if (!blockRange[1]) return
+    console.log(blockRange, blockRange[1] - blockRange[0]);
+    if (!blockRange[1] || (blockRange[1] - blockRange[0]) != constants.initialBlockRangeLimit) return;
+    console.log ('fetching');
     fetchGraph(dispatch, { blockRange, startDate, endDate, miner, cid })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blockRange, startDate, endDate, miner, cid])
@@ -191,10 +194,10 @@ const LaGraphaComponent = () => {
         el.appendChild(tooltipTable)
       }
 
-      if (numEpochsDisplayed === 120){
+      if (numEpochsDisplayed === constants.initialBlockRangeLimit){
         window.graphInstance.fire('zoom-to-point', {y, zoomY })
       } else {
-        window.graphInstance.fire('zoom-to-node-fct', { nodeY: window.graphInstance.model.nodes[5].y, initialPanY: y, zoomY });
+        window.graphInstance.fire('zoom-to-node-fct', { nodeY: window.graphInstance.model.nodes[window.graphInstance.model.nodes.length - 1].y, initialPanY: y, zoomY });
       }
 
       window.graphInstance.on('node-click', ({ node }) => {

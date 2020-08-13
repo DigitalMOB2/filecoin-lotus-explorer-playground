@@ -185,8 +185,11 @@ const mergeDataSets = (set1, set2) => {
     if (ymin > node.y) ymin = node.y;
   });
 
-  yOffset = ymax - ymin;
+  console.log('ymax',ymax);
+  console.log('ymin',ymin);
 
+  //yOffset = ymax - ymin;
+  yOffset = 1;
   set1Processed.chain.nodes.forEach(node => {
     node.y = node.y + yOffset;
   });
@@ -210,7 +213,10 @@ const mergeDataSets = (set1, set2) => {
 
   result.chain.nodes = result.chain.nodes.concat(set2Processed.chain.nodes);
   const newNodeIndexes = {};
-  result.chain.nodes.forEach((node, index) => { newNodeIndexes[node.id] = index; node.x = 0 });
+  result.chain.nodes.forEach((node, index) => {
+    newNodeIndexes[node.id] = index;
+    //node.x = 0
+  });
 
   set1Processed.chain.edges.forEach((edge, index) => {
     if (edgeNodeCID[`set1${index}`]) {
