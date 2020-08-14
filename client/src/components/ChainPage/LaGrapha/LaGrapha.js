@@ -119,9 +119,7 @@ const LaGraphaComponent = () => {
   })
 
   useEffect(() => {
-    console.log(blockRange, blockRange[1] - blockRange[0]);
     if (!blockRange[1] || (blockRange[1] - blockRange[0]) != constants.initialBlockRangeLimit) return;
-    console.log ('fetching');
     fetchGraph(dispatch, { blockRange, startDate, endDate, miner, cid })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blockRange, startDate, endDate, miner, cid])

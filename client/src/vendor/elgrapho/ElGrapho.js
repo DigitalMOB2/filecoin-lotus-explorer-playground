@@ -817,7 +817,6 @@ ElGrapho.prototype = {
   zoomToPoint: function(panX, panY, zoomX, zoomY) {
     Tooltip.hide()
     if (this.animations) {
-      console.log('go anim')
       this.animations = []
 
       let that = this
@@ -849,7 +848,6 @@ ElGrapho.prototype = {
         endTime: new Date().getTime() + 300,
         prop: 'panY',
       })
-      console.log(that.zoomY, zoomY)
       this.dirty = true
     } else {
       this.panX = (this.panX + panX / this.zoomX) * zoomX

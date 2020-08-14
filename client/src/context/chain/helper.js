@@ -185,9 +185,6 @@ const mergeDataSets = (set1, set2) => {
     if (ymin > node.y) ymin = node.y;
   });
 
-  console.log('ymax',ymax);
-  console.log('ymin',ymin);
-
   //yOffset = ymax - ymin;
   yOffset = 1;
   set1Processed.chain.nodes.forEach(node => {
