@@ -157,7 +157,7 @@ const mergeDataSets = (set1, set2) => {
   //rewrite using filter
   const set2FilteredNodes = [];
   for (let i = 0; i < set2.chain.nodes.length; i++) {
-    if (set2.chain.nodes[i].height && set2.chain.nodes[i].height !== lastEpochInSet2) {
+    if (set2.chain.nodes[i].height !== lastEpochInSet2) {
       set2FilteredNodes.push(set2.chain.nodes[i]);
     }
   }

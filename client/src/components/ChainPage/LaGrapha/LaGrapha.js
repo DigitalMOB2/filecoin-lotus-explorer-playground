@@ -197,7 +197,7 @@ const LaGraphaComponent = () => {
       if (numEpochsDisplayed === constants.initialBlockRangeLimit){
         window.graphInstance.fire('zoom-to-point', {y, zoomY })
       } else {
-        window.graphInstance.fire('zoom-to-node-fct', { nodeY: window.graphInstance.model.nodes[window.graphInstance.model.nodes.length - 1].y, initialPanY: y, zoomY });
+        window.graphInstance.fire('zoom-to-node-fct', { nodeY: window.graphInstance.model.nodes[window.graphInstance.model.nodes.length - 3].y, initialPanY: y, zoomY });
       }
 
       window.graphInstance.on('node-click', ({ node }) => {
@@ -205,6 +205,21 @@ const LaGraphaComponent = () => {
         openNodeModal(dispatch)
       })
     }
+  }
+
+  const resetZoom = () => {
+    const height = window.innerHeight
+    const numEpochsDisplayed = blockRange[1] - blockRange[0]
+    const desiredInitialRange = 15
+    const zoomY = numEpochsDisplayed / desiredInitialRange
+    // y for pan is calculated as the desired y midpoint minus the current y midpoint. the 0.95 is because have to account for 5% padding
+    const y = (desiredInitialRange * ((height * 0.95) / numEpochsDisplayed)) / 2 - (height * 0.95) / 2
+
+    //needs to be reworked, the zoomY factor needs to take into account current zoom factor
+    window.graphInstance.fire('reset');
+    setTimeout(() => {
+      window.graphInstance.fire('zoom-to-point', {y, zoomY })
+    }, 300);
   }
 
   return (
@@ -222,7 +237,7 @@ const LaGraphaComponent = () => {
           </LoadMore>
           <ZoomPlus onClick={() => { window.graphInstance.fire('zoom-in'); }}>+</ZoomPlus>
           <ZoomMinus onClick={() => { window.graphInstance.fire('zoom-out'); }}>-</ZoomMinus>
-          <ResetZoom onClick={() => { window.graphInstance.fire('reset'); }}>Reset</ResetZoom>
+          <ResetZoom onClick={() => { resetZoom(); }}>Reset</ResetZoom>
         </div>
       )}
       {isNodeModalOpen && <NodeModal node={selectedNode} close={() => closeNodeModal(dispatch)} />}
