@@ -1,7 +1,4 @@
-FROM node:12-alpine
-
-# 1. Create the working directory at '/home/node/app' and give node use permissions
-RUN mkdir -p /usr/src/app
+FROM node:12-alpine AS dev
 
 # 2. Set the working directory
 WORKDIR /usr/src/app
@@ -20,3 +17,15 @@ EXPOSE 8888
 
 # 8. Run the app
 CMD [ "yarn", "run", "dev" ]
+
+# Production image
+FROM node:12-alpine AS release
+
+WORKDIR /usr/src/app
+
+COPY package.json yarn.lock ./
+RUN yarn install --pure-lockfile
+
+COPY . .
+
+CMD ["yarn", "start"]

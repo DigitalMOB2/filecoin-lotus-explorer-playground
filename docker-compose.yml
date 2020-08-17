@@ -18,11 +18,12 @@ services:
     restart: on-failure
 
   site:
-    build: ./client
+    build:
+      context: ./client
+      target: dev
     volumes:
       - ./client:/usr/src/app
       - explorer_client_node_modules_volume:/usr/src/app/node_modules
-
     depends_on:
       - server
     links:
@@ -38,7 +39,9 @@ services:
       REACT_APP_API_URL: http://server.localtest.me/api
 
   server:
-    build: ./server
+    build:
+      context: ./server
+      target: dev
     volumes:
       - ./server:/usr/src/app
       - explorer_server_node_modules_volume:/usr/src/app/node_modules
