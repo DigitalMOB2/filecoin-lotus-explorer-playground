@@ -17,7 +17,10 @@
     "node-uuid": "^1.4.8",
     "pg": "^7.14.0",
     "winston": "^3.2.1",
-    "winston-transport": "^4.3.0"
+    "winston-transport": "^4.3.0",
+    "d3": "^5.16.0",
+    "d3-node": "^2.2.2",
+    "lodash": "^4.17.19"
   },
   "devDependencies": {
     "@babel/core": "^7.7.5",
