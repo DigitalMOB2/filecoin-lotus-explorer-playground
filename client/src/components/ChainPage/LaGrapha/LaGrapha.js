@@ -22,7 +22,7 @@ const LaGraphaComponent = () => {
   const { blockRange, startDate, endDate, miner, cid, showHeightRuler } = filter
 
   const [loadingGraph, setLoading] = useState(false)
-  const [buildingSvg, setBuildingSvg] = useState(false)
+  //const [buildingSvg, setBuildingSvg] = useState(false)
 
   const loading = loadingData || loadingGraph
   const graphRendered = !!document.getElementsByClassName('concrete-scene-canvas')[0]
