@@ -22,6 +22,7 @@ const LaGraphaComponent = () => {
   const { blockRange, startDate, endDate, miner, cid, showHeightRuler } = filter
 
   const [loadingGraph, setLoading] = useState(false)
+  //old export canvas as png
   //const [buildingSvg, setBuildingSvg] = useState(false)
 
   const loading = loadingData || loadingGraph
