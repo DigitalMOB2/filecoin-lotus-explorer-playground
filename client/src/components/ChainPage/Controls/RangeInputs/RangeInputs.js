@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { RangeInputs } from './range-inputs.styled'
+import { constants } from '../../../../utils/constants'
 
 const RangeInputsComponent = ({ rangeIntervals, onChange }) => {
-  const numberOfEpochsToShow = 10;
   const [min, setMin] = useState(rangeIntervals[0])
   const [max, setMax] = useState(rangeIntervals[1])
 
@@ -26,7 +26,7 @@ const RangeInputsComponent = ({ rangeIntervals, onChange }) => {
   }
 
   const updateMinMax = (max) => {
-    let min = max - numberOfEpochsToShow;
+    let min = max - constants.initialBlockRangeLimit;
     if (min < 0) min = 0;
     setMax(max);
     setMin(min);
