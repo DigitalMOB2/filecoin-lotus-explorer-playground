@@ -73,7 +73,8 @@ services:
     command: postgres -D /run/pgsql-10.4-data -c logging_collector=on
     volumes:
       - ./api/db/local_database_volume:/run/pgsql-10.4-data
-      #- ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      #- ./1.init.sql:/docker-entrypoint-initdb.d/1.init.sql
+      #- ./2.create-views.sql:/docker-entrypoint-initdb.d/2.create-views.sql
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 10s
