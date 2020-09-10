@@ -24,15 +24,20 @@ export const fetchGraph = async (dispatch, payload) => {
 }
 
 export const loadMoreData = async (dispatch, previousChain, originalPositions, payload) => {
-  dispatch({ type: 'CHANGE_LOADING', payload: true })
+  dispatch({ type: 'CHANGE_LOADING', payload: true });
   try {
     const localPayload = { ...payload, blockRange: [payload.blockRange[0], payload.blockRange[1]] };
-    localPayload.blockRange[1] = localPayload.blockRange[0];
-    const min = localPayload.blockRange[0] - constants.initialBlockRangeLimit;
-    localPayload.blockRange[0] = min < 0 ? 0 : min;
+    if (payload.up) {
+      localPayload.blockRange[0] = localPayload.blockRange[1];
+      localPayload.blockRange[1] = localPayload.blockRange[1] + constants.initialBlockRangeLimit;
+    } else {
+      localPayload.blockRange[1] = localPayload.blockRange[0];
+      const min = localPayload.blockRange[0] - constants.initialBlockRangeLimit;
+      localPayload.blockRange[0] = min < 0 ? 0 : min;
+    }
 
-    dispatch({ type: 'CHANGE_RANGE', payload: { range: [localPayload.blockRange[0], payload.blockRange[1]] } })
-    dispatch({ type: 'CHANGE_FILTER', payload: { key: 'blockRange', value: [localPayload.blockRange[0], payload.blockRange[1]] } })
+    dispatch({ type: 'CHANGE_RANGE', payload: { range: [localPayload.blockRange[0], localPayload.blockRange[1]] } });
+    dispatch({ type: 'CHANGE_FILTER', payload: { key: 'blockRange', value: [localPayload.blockRange[0], localPayload.blockRange[1]] } });
 
     const chain = await getChainLoadMore(previousChain, originalPositions, localPayload)
 
@@ -43,7 +48,7 @@ export const loadMoreData = async (dispatch, previousChain, originalPositions, p
 
     dispatch({ type: 'CHANGE_CHAIN', payload: chain })
   } catch (error) {
-    console.error('Error in request', error)
+    console.error('Error in request', error);
 
     toast.error('An error has occurred while fetching node chain.')
   }
