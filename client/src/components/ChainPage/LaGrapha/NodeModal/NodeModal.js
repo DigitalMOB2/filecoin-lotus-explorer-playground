@@ -9,7 +9,7 @@ const NodeModalComponent = ({ node, close }) => {
   const data = [
     { title: 'Hash', key: 'id' },
     { title: 'Height', key: 'height' },
-    { title: 'Timestamp', value: timestamp },
+    { title: 'Timestamp', value: `${node.timestamp} (${timestamp})` },
     { title: 'Block Size', key: '' },
     { title: 'Messages', key: 'messages' },
     { title: 'Reward', key: '' },

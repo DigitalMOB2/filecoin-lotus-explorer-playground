@@ -277,7 +277,7 @@ ElGrapho.prototype = {
       lastHeight = node.height;
 
       let index = n * 2;
-      this.heights.addLabel(`${node.height}`, positions[index], positions[index + 1])
+      this.heights.addLabel(`${node.height}`, positions[index], positions[index + 1], node.timestamp)
     });
 
     // render
@@ -309,12 +309,18 @@ ElGrapho.prototype = {
       return
     }
 
+    let x = halfWidth / scale - 10;
+    let y = (-1 * halfHeight * this.zoomY - this.panY) / scale + 100;
+    rulerContext.fillText('Height', x, y);
+    rulerContext.fillText('Timestamp', x, y + fontSize);
+
     this.heights.heightsAdded.forEach((label, i) => {
-      let x = halfWidth / scale - 20;
+      let x = halfWidth / scale - 10;
       let y = (label.y * -1 * halfHeight * this.zoomY - this.panY) / scale + 5;
 
       rulerContext.beginPath();
-      rulerContext.fillText(label.str, x, y)
+      rulerContext.fillText(label.str, x, y);
+      rulerContext.fillText(label.timestamp, x, y + fontSize);
     });
 
     rulerContext.restore()
@@ -607,13 +613,13 @@ ElGrapho.prototype = {
       const {rectWidth, rectHeight, buttons} = that.buttons;
       const { x, y } = that.getMousePosition(evt);
       const buttonIdx = buttons.findIndex((rect, idx) => {
-          const x1 = rect.x - rectWidth / 2;
-          const x2 = rect.x + rectWidth / 2;
-          const y1 = rect.y - rectHeight / 2;
-          const y2 = rect.y + rectHeight / 2;
+        const x1 = rect.x - rectWidth / 2;
+        const x2 = rect.x + rectWidth / 2;
+        const y1 = rect.y - rectHeight / 2;
+        const y2 = rect.y + rectHeight / 2;
 
-          return x >= x1 && x <= x2 && y >= y1 && y <= y2;
-        });
+        return x >= x1 && x <= x2 && y >= y1 && y <= y2;
+      });
 
       if (buttonIdx === 0) {
         that.onLoadMoreUp()
@@ -829,19 +835,25 @@ ElGrapho.prototype = {
           that.deselectNode();
           that.deselectDoubleSelectNode();
           that.deselectGroup()
-        } else if (that.selectedIndex === -1) {
-          // doing it with click twice instead of click in circle to not have to do calculations about being within range of dot from anywhere in circle
-          // assume first click to show tipset second to show miner
-          that.selectNode(dataIndex);
-          that.selectGroup(that.vertices.points.glowColors[dataIndex])
-        } else if (that.doubleSelectedIndex === -1) {
-          that.deselectGroup();
-          that.doubleSelectNode(dataIndex);
-          that.selectGroup(that.vertices.points.colors[dataIndex])
         } else {
-          that.deselectGroup();
-          // todo: see what's up with the unknown timetoreceive and why its grouping group 0 and 1
-          that.selectGroup(that.vertices.points.outlineColors[dataIndex])
+          that.fire(Enums.events.NODE_CLICK, {
+            dataIndex,
+            node: that.model.nodes[dataIndex],
+          });
+          if (that.selectedIndex === -1) {
+            // doing it with click twice instead of click in circle to not have to do calculations about being within range of dot from anywhere in circle
+            // assume first click to show tipset second to show miner
+            that.selectNode(dataIndex);
+            that.selectGroup(that.vertices.points.glowColors[dataIndex])
+          } else if (that.doubleSelectedIndex === -1) {
+            that.deselectGroup();
+            that.doubleSelectNode(dataIndex);
+            that.selectGroup(that.vertices.points.colors[dataIndex])
+          } else {
+            that.deselectGroup();
+            // todo: see what's up with the unknown timetoreceive and why its grouping group 0 and 1
+            that.selectGroup(that.vertices.points.outlineColors[dataIndex])
+          }
         }
       }
 
