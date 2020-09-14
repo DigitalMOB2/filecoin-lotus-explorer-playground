@@ -27,19 +27,25 @@ export const loadMoreData = async (dispatch, previousChain, originalPositions, p
   dispatch({ type: 'CHANGE_LOADING', payload: true });
   try {
     const localPayload = { ...payload, blockRange: [payload.blockRange[0], payload.blockRange[1]] };
+    let totalEpochs = 0;
     if (payload.up) {
       localPayload.blockRange[0] = localPayload.blockRange[1];
       localPayload.blockRange[1] = localPayload.blockRange[1] + constants.initialBlockRangeLimit;
+
+      dispatch({ type: 'CHANGE_RANGE', payload: { range: [payload.blockRange[0], localPayload.blockRange[1]] } })
+      dispatch({ type: 'CHANGE_FILTER', payload: { key: 'blockRange', value: [payload.blockRange[0], localPayload.blockRange[1]] } })
+      totalEpochs = localPayload.blockRange[1] - payload.blockRange[0];
     } else {
       localPayload.blockRange[1] = localPayload.blockRange[0];
       const min = localPayload.blockRange[0] - constants.initialBlockRangeLimit;
       localPayload.blockRange[0] = min < 0 ? 0 : min;
+
+      dispatch({ type: 'CHANGE_RANGE', payload: { range: [localPayload.blockRange[0], payload.blockRange[1]] } })
+      dispatch({ type: 'CHANGE_FILTER', payload: { key: 'blockRange', value: [localPayload.blockRange[0], payload.blockRange[1]] } })
+      totalEpochs = payload.blockRange[1] - localPayload.blockRange[0];
     }
 
-    dispatch({ type: 'CHANGE_RANGE', payload: { range: [localPayload.blockRange[0], localPayload.blockRange[1]] } });
-    dispatch({ type: 'CHANGE_FILTER', payload: { key: 'blockRange', value: [localPayload.blockRange[0], localPayload.blockRange[1]] } });
-
-    const chain = await getChainLoadMore(previousChain, originalPositions, localPayload)
+    const chain = await getChainLoadMore(previousChain, originalPositions, localPayload, payload.up, totalEpochs/constants.initialBlockRangeLimit)
 
     const newOriginalPositions = saveNodeOriginalPositions(chain);
     if (newOriginalPositions.length > 1) {

@@ -22,7 +22,7 @@ export const getChain = async ({ blockRange, startDate, endDate, miner, cid }) =
   }
 }
 
-export const getChainLoadMore = async (crtChainData, originalPositions, { blockRange, startDate, endDate, miner, cid }) => {
+export const getChainLoadMore = async (crtChainData, originalPositions, { blockRange, startDate, endDate, miner, cid }, up, totalEpochs) => {
   const newChainData = await getChainData({
     blockRange: [blockRange[0], blockRange[1]],
     startDate,
@@ -36,8 +36,17 @@ export const getChainLoadMore = async (crtChainData, originalPositions, { blockR
     node.y = originalPositions[index].y;
   });
 
-
-  const { chain, orphans } = mergeDataSets(crtChainData, newChainData);
+  let chain;
+  let orphans;
+  if (up) {
+    const mergedDataSets = mergeDataSetsUp(crtChainData, newChainData, totalEpochs - 1);
+    chain = mergedDataSets.chain;
+    orphans = mergedDataSets.orphans;
+  } else {
+    const mergedDataSets = mergeDataSets(crtChainData, newChainData);
+    chain = mergedDataSets.chain;
+    orphans = mergedDataSets.orphans;
+  }
   const miners = mapMiners(chain);
   const timeToReceive = mapTimeToReceive(chain);
 
@@ -188,6 +197,114 @@ const mergeDataSets = (set1, set2) => {
   //yOffset = ymax - ymin;
   yOffset = 1;
   set1Processed.chain.nodes.forEach(node => {
+    node.y = node.y + yOffset;
+  });
+
+  let result = {
+    chain: {
+      nodes: set1Processed.chain.nodes,
+      edges: [],
+      miners: set1Processed.chain.miners
+    },
+    orphans: set1Processed.orphans.concat(set2Processed.orphans)
+  };
+
+  Object.keys(set2Processed.chain.miners).forEach ( minerId => {
+    if (result.chain.miners[minerId]) {
+        result.chain.miners[minerId] += set2Processed.chain.miners[minerId];
+    } else {
+        result.chain.miners[minerId] = set2Processed.chain.miners[minerId];
+    }
+  });
+
+  result.chain.nodes = result.chain.nodes.concat(set2Processed.chain.nodes);
+  const newNodeIndexes = {};
+  result.chain.nodes.forEach((node, index) => {
+    newNodeIndexes[node.id] = index;
+    //node.x = 0
+  });
+
+  set1Processed.chain.edges.forEach((edge, index) => {
+    if (edgeNodeCID[`set1${index}`]) {
+      if (newNodeIndexes[edgeNodeCID[`set1${index}`].fromId] >= 0 && newNodeIndexes[edgeNodeCID[`set1${index}`].toId] >= 0) {
+        edge.from = newNodeIndexes[edgeNodeCID[`set1${index}`].fromId];
+        edge.to = newNodeIndexes[edgeNodeCID[`set1${index}`].toId];
+        result.chain.edges.push(edge);
+      }
+    }
+  });
+  set2Processed.chain.edges.forEach((edge, index) => {
+    if (edgeNodeCID[`set2${index}`]) {
+      if (newNodeIndexes[edgeNodeCID[`set2${index}`].fromId] >= 0 && newNodeIndexes[edgeNodeCID[`set2${index}`].toId] >= 0) {
+        edge.from = newNodeIndexes[edgeNodeCID[`set2${index}`].fromId];
+        edge.to = newNodeIndexes[edgeNodeCID[`set2${index}`].toId];
+        result.chain.edges.push(edge);
+      }
+    }
+  });
+
+  return result;
+}
+
+
+const mergeDataSetsUp = (set1, set2, sets) => {
+  const edgeNodeCID = {};
+  set1.chain.edges.forEach((edge, index) => {
+    if (set1.chain.nodes[edge.from].id && set1.chain.nodes[edge.to].id)
+      edgeNodeCID[`set1${index}`] = {
+        fromId: set1.chain.nodes[edge.from].id,
+        toId: set1.chain.nodes[edge.to].id,
+      }
+  });
+
+  set2.chain.edges.forEach((edge, index) => {
+    if (set2.chain.nodes[edge.from].id && set2.chain.nodes[edge.to].id)
+      edgeNodeCID[`set2${index}`] = {
+        fromId: set2.chain.nodes[edge.from].id,
+        toId: set2.chain.nodes[edge.to].id,
+      }
+  });
+
+  //remove last epoch in set 2
+  let lastEpochInSet2 = 0;
+  set2.chain.nodes.forEach(node => {
+    if (lastEpochInSet2*1 > node.height*1) lastEpochInSet2 = node.height;
+  });
+
+  //rewrite using filter
+  const set2FilteredNodes = [];
+  for (let i = 0; i < set2.chain.nodes.length; i++) {
+    if (set2.chain.nodes[i].height !== lastEpochInSet2) {
+      set2FilteredNodes.push(set2.chain.nodes[i]);
+    }
+  }
+
+  const set1FilteredNodes = [];
+  for (let i = 0; i < set1.chain.nodes.length; i++) {
+    if (set1.chain.nodes[i].height) {
+      set1FilteredNodes.push(set1.chain.nodes[i]);
+    }
+  }
+
+  const set2Processed = { ...set2 };
+  set2Processed.chain.nodes = set2FilteredNodes;
+
+  const set1Processed = { ...set1 };
+  set1Processed.chain.nodes = set1FilteredNodes;
+
+  let yOffset = 0;
+
+  let ymax = 0;
+  let ymin = 0;
+
+  set2.chain.nodes.forEach(node => {
+    if (ymax < node.y) ymax = node.y;
+    if (ymin > node.y) ymin = node.y;
+  });
+
+  //yOffset = ymax - ymin;
+  yOffset = sets;
+  set2Processed.chain.nodes.forEach(node => {
     node.y = node.y + yOffset;
   });
 

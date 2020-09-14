@@ -235,10 +235,6 @@ const LaGraphaComponent = () => {
               Save Graph
             </SaveGraph>
           </a>
-
-          <LoadMore onClick={() => { loadMoreData(dispatch, chain, originalPositions, { blockRange, startDate, endDate, miner, cid }) }} >
-            Load More
-          </LoadMore>
           <ZoomPlus onClick={() => { window.graphInstance.fire('zoom-in'); }}>+</ZoomPlus>
           <ZoomMinus onClick={() => { window.graphInstance.fire('zoom-out'); }}>-</ZoomMinus>
           <ResetZoom onClick={() => { resetZoom(); }}>Reset</ResetZoom>
