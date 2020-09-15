@@ -90,7 +90,8 @@ ElGrapho.prototype = {
     this.debug = config.debug === undefined ? false : config.debug;
 
     this.showArrows = config.arrows === undefined ? false : config.arrows;
-    this.hasButtons = true;
+    this.hasTopLoadMoreButton = config.hasTopLoadMoreButton;
+    this.hasBottomLoadMoreButton = config.hasBottomLoadMoreButton;
     this.buttons = {
       font: '600 12px Arial',
       textAlign: 'center',
@@ -323,14 +324,14 @@ ElGrapho.prototype = {
     rulerContext.restore()
   },
   renderButtons: function() {
+    if (!this.heights.heightsAdded) {
+      return
+    }
+
     let halfWidth = this.width / 2;
     let halfHeight = this.height / 2;
     let minY = 0;
     let maxY = 0;
-
-    if (!this.heights.heightsAdded) {
-      return
-    }
 
     this.heights.heightsAdded.forEach((el) => {
       if (minY > el.y) {
@@ -342,16 +343,22 @@ ElGrapho.prototype = {
     });
 
     this.buttons.buttons = [];
-    this.buttons.buttons.push({
-      x: halfWidth + this.panX,
-      y: -halfHeight * minY - this.panY + halfHeight * minY * this.zoomY - 60,
-      text: 'Load More',
-    });
-    this.buttons.buttons.push({
-      x: halfWidth + this.panX,
-      y: halfHeight * maxY - this.panY + halfHeight * maxY * this.zoomY + 100,
-      text: 'Load More',
-    });
+    if (this.hasTopLoadMoreButton) {
+      this.buttons.buttons.push({
+        x: halfWidth + this.panX,
+        y: -halfHeight * minY - this.panY + halfHeight * minY * this.zoomY - 60,
+        text: 'Load More',
+        type: 'top',
+      });
+    }
+    if (this.hasBottomLoadMoreButton) {
+      this.buttons.buttons.push({
+        x: halfWidth + this.panX,
+        y: halfHeight * maxY - this.panY + halfHeight * maxY * this.zoomY + 100,
+        text: 'Load More',
+        type: 'bottom',
+      });
+    }
 
     let buttonsScene = this.buttonsLayer.scene;
     let buttonsContext = buttonsScene.context;
@@ -607,9 +614,9 @@ ElGrapho.prototype = {
         return
       }
 
-      const {rectWidth, rectHeight, buttons} = that.buttons;
+      const { rectWidth, rectHeight, buttons } = that.buttons;
       const { x, y } = that.getMousePosition(evt);
-      const buttonIdx = buttons.findIndex((rect, idx) => {
+      const button = buttons.find((rect) => {
         const x1 = rect.x - rectWidth / 2;
         const x2 = rect.x + rectWidth / 2;
         const y1 = rect.y - rectHeight / 2;
@@ -618,11 +625,13 @@ ElGrapho.prototype = {
         return x >= x1 && x <= x2 && y >= y1 && y <= y2;
       });
 
-      if (buttonIdx === 0) {
-        that.onLoadMoreUp()
-      }
-      if (buttonIdx === 1) {
-        that.onLoadMoreDown()
+      if (button) {
+        if (button.type === 'top') {
+          that.onLoadMoreUp()
+        }
+        if (button.type === 'bottom') {
+          that.onLoadMoreDown()
+        }
       }
     });
 

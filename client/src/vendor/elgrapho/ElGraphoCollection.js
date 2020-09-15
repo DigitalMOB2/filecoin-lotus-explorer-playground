@@ -108,7 +108,7 @@ let ElGraphoCollection = {
         graph.labelsLayer.scene.clear();
         graph.rulerLayer.scene.clear();
 
-        if (graph.hasButtons) {
+        if (graph.hasTopLoadMoreButton || graph.hasBottomLoadMoreButton) {
           graph.renderButtons()
         }
 

@@ -173,6 +173,8 @@ const LaGraphaComponent = ({ maxBlock }) => {
           nodeSize: 1,
           nodeOutline: false,
           darkMode: 1,
+          hasTopLoadMoreButton: state.filter.blockRange[1] < state.filter.maxBlock,
+          hasBottomLoadMoreButton: state.filter.blockRange[0] > state.filter.minBlock,
           callback: () => {
             setLoading(false)
           },
