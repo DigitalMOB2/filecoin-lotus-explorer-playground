@@ -16,7 +16,7 @@ import { tooltip } from './tooltip'
 import { constants } from '../../../utils'
 import { config } from '../../../config'
 
-const LaGraphaComponent = () => {
+const LaGraphaComponent = ({ maxBlock }) => {
   const { state, dispatch } = useContext(store);
   const { chain, originalPositions, loading: loadingData, filter, selectedNode, isNodeModalOpen } = state;
   const { blockRange, startDate, endDate, miner, cid, showHeightRuler } = filter;
@@ -176,8 +176,8 @@ const LaGraphaComponent = () => {
           callback: () => {
             setLoading(false)
           },
-          onLoadMoreUp: () => loadMoreData(dispatch, chain, originalPositions, { blockRange, startDate, endDate, miner, cid, up: true }),
-          onLoadMoreDown: () => loadMoreData(dispatch, chain, originalPositions, { blockRange, startDate, endDate, miner, cid }),
+          onLoadMoreUp: () => loadMoreData(dispatch, chain, originalPositions, { blockRange, startDate, endDate, miner, cid, up: true, maxBlock }),
+          onLoadMoreDown: () => loadMoreData(dispatch, chain, originalPositions, { blockRange, startDate, endDate, miner, cid, up: false, maxBlock }),
         })
       } catch (error) {
         console.error('Error building graph', error);

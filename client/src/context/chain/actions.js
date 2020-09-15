@@ -29,8 +29,10 @@ export const loadMoreData = async (dispatch, previousChain, originalPositions, p
     const localPayload = { ...payload, blockRange: [payload.blockRange[0], payload.blockRange[1]] };
     let totalEpochs = 0;
     if (payload.up) {
+      console.log(payload.maxBlock)
       localPayload.blockRange[0] = localPayload.blockRange[1];
       localPayload.blockRange[1] = localPayload.blockRange[1] + constants.initialBlockRangeLimit;
+      localPayload.blockRange[1] = localPayload.blockRange[1] > payload.maxBlock ? payload.maxBlock : localPayload.blockRange[1];
 
       dispatch({ type: 'CHANGE_RANGE', payload: { range: [payload.blockRange[0], localPayload.blockRange[1]] } })
       dispatch({ type: 'CHANGE_FILTER', payload: { key: 'blockRange', value: [payload.blockRange[0], localPayload.blockRange[1]] } })
@@ -45,7 +47,7 @@ export const loadMoreData = async (dispatch, previousChain, originalPositions, p
       totalEpochs = payload.blockRange[1] - localPayload.blockRange[0];
     }
 
-    const chain = await getChainLoadMore(previousChain, originalPositions, localPayload, payload.up, totalEpochs/constants.initialBlockRangeLimit)
+    const chain = await getChainLoadMore(previousChain, originalPositions, localPayload, payload.up, totalEpochs / constants.initialBlockRangeLimit)
 
     const newOriginalPositions = saveNodeOriginalPositions(chain);
     if (newOriginalPositions.length > 1) {
