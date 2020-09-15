@@ -1,6 +1,8 @@
+import debounce from 'lodash/debounce'
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
 import React, { useContext, useEffect } from 'react'
+import { changeFilter } from '../../../context/filter/actions'
 import { changeRange } from '../../../context/range/actions'
 import { store } from '../../../context/store'
 import { constants } from '../../../utils'
@@ -12,6 +14,10 @@ const RangeComponent = ({ minBlock, maxBlock }) => {
   const { state, dispatch } = useContext(store)
   const { range } = state
 
+  const debouncedBlockRangeChange = debounce((blockRange) => {
+    changeFilter(dispatch, { key: 'blockRange', value: blockRange })
+  }, 500)
+
   useEffect(() => {
     if (maxBlock !== range[0]) {
       changeRange(dispatch, range, [Math.max(1, maxBlock - constants.initialBlockRangeLimit), maxBlock])
@@ -19,6 +25,10 @@ const RangeComponent = ({ minBlock, maxBlock }) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [maxBlock])
+
+  const onChangeRange = (newInternalBlockRange) => {
+    changeRange(dispatch, range, newInternalBlockRange)
+  }
 
   return (
     <RangeContainer>
@@ -30,6 +40,8 @@ const RangeComponent = ({ minBlock, maxBlock }) => {
           value={range}
           step={5}
           allowCross={false}
+          onChange={onChangeRange}
+          onAfterChange={debouncedBlockRangeChange}
         />
       ) : (
         <Spacer />

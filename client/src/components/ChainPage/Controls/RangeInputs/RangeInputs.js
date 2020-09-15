@@ -22,24 +22,45 @@ const RangeInputsComponent = ({ rangeIntervals, onChange }) => {
   const onSubmit = () => {
     if (min === rangeIntervals[0] && max === rangeIntervals[1]) return
 
-    onChange([Number(min), Number(max)])
+    onChange([min, max])
   }
 
-  const updateMinMax = (max) => {
-    let min = max - constants.initialBlockRangeLimit;
-    if (min < 0) min = 0;
-    setMax(max);
+  const updateMin = (e) => {
+    const min = Number(e.target.value);
+    if (min + constants.initialBlockRangeLimit > max) {
+      setMax(min + constants.initialBlockRangeLimit);
+    }
+
     setMin(min);
+  }
+
+  const updateMax = (e) => {
+    const max = Number(e.target.value);
+    if (max - constants.initialBlockRangeLimit > min) {
+      setMin(max - constants.initialBlockRangeLimit);
+    }
+
+    setMax(max);
   }
 
   return (
     <RangeInputs>
       <div>
-        <input value={min} />
+        <input
+          value={min}
+          onKeyPress={onKeyPress}
+          onBlur={onSubmit}
+          onChange={updateMin}
+        />
         <span>Min</span>
       </div>
       <div>
-        <input value={max} onKeyPress={onKeyPress} onBlur={onSubmit} onChange={(e) => updateMinMax(e.target.value) } />
+        <input
+          value={max}
+          onKeyPress={onKeyPress}
+          onBlur={onSubmit}
+          onChange={updateMax}
+        />
         <span>Max</span>
       </div>
     </RangeInputs>
