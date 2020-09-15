@@ -10,7 +10,15 @@ import { selectNode } from '../../../context/selected-node/actions'
 import { store } from '../../../context/store'
 import ElGrapho from '../../../vendor/elgrapho/ElGrapho'
 import { Loader } from '../../shared/Loader'
-import { LaGrapha, LaGraphaWrapper, SaveGraph, LoadMore, ZoomPlus, ZoomMinus, ResetZoom } from './la-grapha.styled'
+import {
+  LaGrapha,
+  LaGraphaWrapper,
+  SaveGraph,
+  // LoadMore,
+  ZoomPlus,
+  ZoomMinus,
+  ResetZoom,
+} from './la-grapha.styled'
 import { NodeModal } from './NodeModal/NodeModal'
 import { tooltip } from './tooltip'
 import { constants } from '../../../utils'
@@ -22,6 +30,7 @@ const LaGraphaComponent = ({ maxBlock }) => {
   const { blockRange, startDate, endDate, miner, cid, showHeightRuler } = filter;
 
   const [loadingGraph, setLoading] = useState(false);
+  const [skipFetchGraph, setSkipFetchGraph] = useState(false);
   //old export canvas as png
   //const [buildingSvg, setBuildingSvg] = useState(false)
 
@@ -118,7 +127,7 @@ const LaGraphaComponent = ({ maxBlock }) => {
   });
 
   useEffect(() => {
-    if (!blockRange[1] || (blockRange[1] - blockRange[0]) > constants.maxBlockRange) return;
+    if (!blockRange[1] || skipFetchGraph) return;
     fetchGraph(dispatch, { blockRange, startDate, endDate, miner, cid })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blockRange, startDate, endDate, miner, cid]);
@@ -161,6 +170,12 @@ const LaGraphaComponent = ({ maxBlock }) => {
     const y = (desiredInitialRange * ((height * 0.95) / numEpochsDisplayed)) / 2 - (height * 0.95) / 2;
     const { nodes } = chain.chain;
 
+    const onLoadMoreData = ({ up }) => {
+      setSkipFetchGraph(true);
+      const payload = { blockRange, startDate, endDate, miner, cid, up, maxBlock };
+      loadMoreData(dispatch, chain, originalPositions, payload).then(() => setSkipFetchGraph(false));
+    };
+
     if (nodes.length > 0) {
       try {
         window.graphInstance = new ElGrapho({
@@ -175,11 +190,9 @@ const LaGraphaComponent = ({ maxBlock }) => {
           darkMode: 1,
           hasTopLoadMoreButton: state.filter.blockRange[1] < state.filter.maxBlock,
           hasBottomLoadMoreButton: state.filter.blockRange[0] > state.filter.minBlock,
-          callback: () => {
-            setLoading(false)
-          },
-          onLoadMoreUp: () => loadMoreData(dispatch, chain, originalPositions, { blockRange, startDate, endDate, miner, cid, up: true, maxBlock }),
-          onLoadMoreDown: () => loadMoreData(dispatch, chain, originalPositions, { blockRange, startDate, endDate, miner, cid, up: false, maxBlock }),
+          callback: () => setLoading(false),
+          onLoadMoreUp: () => onLoadMoreData({ up: true }),
+          onLoadMoreDown: () => onLoadMoreData({ up: false }),
         })
       } catch (error) {
         console.error('Error building graph', error);
