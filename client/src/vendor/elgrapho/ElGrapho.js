@@ -19,6 +19,7 @@ const Dom = require('./Dom');
 const Loading = require('./components/Loading/Loading');
 const Labels = require('./Labels');
 const Heights = require('./Heights');
+const { DateTime } =  require('luxon');
 
 const Tree = require('./layouts/Tree');
 const Cluster = require('./layouts/Cluster');
@@ -309,18 +310,14 @@ ElGrapho.prototype = {
       return
     }
 
-    let x = halfWidth / scale - 10;
-    let y = (-1 * halfHeight * this.zoomY - this.panY) / scale + 100;
-    rulerContext.fillText('Height', x, y);
-    rulerContext.fillText('Timestamp', x, y + fontSize);
-
     this.heights.heightsAdded.forEach((label, i) => {
       let x = halfWidth / scale - 10;
       let y = (label.y * -1 * halfHeight * this.zoomY - this.panY) / scale + 5;
+      const timestamp = DateTime.fromSeconds(Number(label.timestamp)).toFormat('MM/dd/yyyy, hh:mm:ss a');
 
       rulerContext.beginPath();
       rulerContext.fillText(label.str, x, y);
-      rulerContext.fillText(label.timestamp, x, y + fontSize);
+      rulerContext.fillText(timestamp, x, y + fontSize);
     });
 
     rulerContext.restore()

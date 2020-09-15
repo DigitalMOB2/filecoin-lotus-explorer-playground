@@ -4,7 +4,7 @@ import { Block, CloseButton, Content, NodeModal, Title, PurpleLink } from './nod
 import { DateTime } from 'luxon'
 
 const NodeModalComponent = ({ node, close }) => {
-  const timestamp = DateTime.fromSeconds(Number(node.timestamp)).toLocaleString(DateTime.DATETIME_MED)
+  const timestamp = DateTime.fromSeconds(Number(node.timestamp)).toFormat('MM/dd/yy, hh:mm:ss a');
 
   const data = [
     { title: 'Hash', key: 'id' },
