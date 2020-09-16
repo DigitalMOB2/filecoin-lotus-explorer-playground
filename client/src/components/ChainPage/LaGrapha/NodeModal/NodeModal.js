@@ -20,7 +20,7 @@ const NodeModalComponent = ({ node, close }) => {
   ]
 
   const openFilscan = () => {
-    const link = ` https://filscan.io/#/tipset?hash=${node.id}`
+    const link = `${process.env.REACT_APP_EXPLORER_PREFIX}#/tipset?hash=${node.id}`
 
     window.open(link)
   }

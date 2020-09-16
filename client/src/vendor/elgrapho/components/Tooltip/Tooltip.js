@@ -17,7 +17,9 @@ const Tooltip = {
 
     Tooltip.wrapper.style.display = 'inline-block';
     Tooltip.wrapper.style.left = x + 'px';
-    Tooltip.wrapper.style.bottom = (window.innerHeight - y + 10) + 'px';
+    Tooltip.wrapper.style.bottom = Tooltip.wrapper.clientHeight + 10 < y
+      ? (window.innerHeight - y + 10) + 'px'
+      : (window.innerHeight - Tooltip.wrapper.clientHeight - y - 10) + 'px';
 
     template(index, this.wrapper);
   },

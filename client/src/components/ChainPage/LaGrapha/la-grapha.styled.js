@@ -64,7 +64,7 @@ export const LoadMore = styled.button`
   position: absolute;
   padding: 8px 18px;
   z-index: 200;
-  top: 50px;
+  top: 118px;
   left: 16px;
 
   &:hover {
@@ -97,7 +97,7 @@ export const ZoomPlus = styled.button`
   position: absolute;
   padding: 8px 18px;
   z-index: 200;
-  top: 84px;
+  top: 50px;
   left: 16px;
 
   &:hover {
@@ -129,7 +129,7 @@ export const ZoomMinus = styled.button`
   position: absolute;
   padding: 8px 18px;
   z-index: 200;
-  top: 84px;
+  top: 50px;
   left: 74px;
 
   &:hover {
@@ -161,7 +161,7 @@ export const ResetZoom = styled.button`
   position: absolute;
   padding: 8px 18px;
   z-index: 200;
-  top: 118px;
+  top: 84px;
   left: 16px;
 
   &:hover {

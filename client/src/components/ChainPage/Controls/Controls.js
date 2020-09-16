@@ -69,6 +69,11 @@ const ControlsComponent = ({ maxBlock }) => {
 
   return (
     <Controls id="controls">
+      {process.env.REACT_APP_NETWORK && (
+        <Block>
+          <Title>Network: {process.env.REACT_APP_NETWORK}</Title>
+        </Block>
+      )}
       <Block>
         <Title>Block Height</Title>
         <DashedLine />
