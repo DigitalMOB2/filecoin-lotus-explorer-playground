@@ -245,11 +245,11 @@ const LaGraphaComponent = ({ maxBlock }) => {
       <LaGrapha ref={laGraphaRef} />
       {!loading && (
         <div>
-          <a href={`${config.apiUrl}/chain/saveAsSvg?startBlock=${blockRange[0]}&endBlock=${blockRange[1]}`}  target="_blank">
-            <SaveGraph>
-              Save Graph
-            </SaveGraph>
-          </a>
+          <SaveGraph onClick={() => {
+            window.open(`${config.apiUrl}/chain/saveAsSvg?startBlock=${blockRange[0]}&endBlock=${blockRange[1]}`);
+          }}>
+            Save Graph
+          </SaveGraph>
           <ZoomPlus onClick={() => { window.graphInstance.fire('zoom-in'); }}>+</ZoomPlus>
           <ZoomMinus onClick={() => { window.graphInstance.fire('zoom-out'); }}>-</ZoomMinus>
           <ResetZoom onClick={() => { resetZoom(); }}>Reset</ResetZoom>

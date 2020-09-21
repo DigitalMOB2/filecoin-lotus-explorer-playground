@@ -47,6 +47,10 @@ export const Title = styled.h3`
   letter-spacing: 0.02em;
   margin-bottom: 8px;
   text-transform: uppercase;
+
+  &:only-child {
+    margin-bottom: 0px;
+  }
 `
 
 export const Description = styled.p`
