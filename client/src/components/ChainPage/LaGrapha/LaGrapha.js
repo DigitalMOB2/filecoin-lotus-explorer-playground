@@ -8,6 +8,8 @@ import { fetchGraph, loadMoreData } from '../../../context/chain/actions'
 import { closeNodeModal, openNodeModal } from '../../../context/node-modal/actions'
 import { selectNode } from '../../../context/selected-node/actions'
 import { store } from '../../../context/store'
+import { changeFilter } from '../../../context/filter/actions';
+import { changeRange } from "../../../context/range/actions";
 import ElGrapho from '../../../vendor/elgrapho/ElGrapho'
 import { Loader } from '../../shared/Loader'
 import {
@@ -31,6 +33,7 @@ const LaGraphaComponent = ({ maxBlock }) => {
 
   const [loadingGraph, setLoading] = useState(false);
   const [skipFetchGraph, setSkipFetchGraph] = useState(false);
+  const [cidToSelect, setCidToSelect] = useState(null);
   //old export canvas as png
   //const [buildingSvg, setBuildingSvg] = useState(false)
 
@@ -69,6 +72,19 @@ const LaGraphaComponent = ({ maxBlock }) => {
     window.graphInstance.fire('zoom-to-node', { nodeY: model.nodes[index].y, initialPanY: y })
   };
 
+  useEffect(() => {
+    if (!cidToSelect || loading) {
+      return;
+    }
+
+    const index = findIndex(model.nodes, { blockCid: cidToSelect });
+    if (index >= 0) {
+      window.graphInstance.fire('select-node', { index });
+      window.graphInstance.fire('zoom-to-node', { nodeY: model.nodes[index].y, initialPanY: y });
+      setCidToSelect(null);
+    }
+  }, [loading, cidToSelect, model.nodes]);
+
   const onSelectNode = async (e) => {
     const cid = e.detail;
     const index = findIndex(model.nodes, { id: cid });
@@ -91,12 +107,33 @@ const LaGraphaComponent = ({ maxBlock }) => {
         return
       }
 
-      toast.info(
+      const toastId = toast.info(
         <div>
           This node is not in your current range. <br />
           <br />
           Change your range to include the height of <strong>{blockWithHeight.height}</strong>.
+          <br />
+          <br />
+          <button
+            onClick={() => {
+              const newRange = changeRange(
+                dispatch,
+                state.range,
+                [
+                  Math.max(0, Number(blockWithHeight.height) - constants.initialBlockRangeLimit),
+                  Math.max(Number(blockWithHeight.height), constants.initialBlockRangeLimit),
+                ]
+              );
+              changeFilter(dispatch, { key: 'blockRange', value: newRange });
+              toast.dismiss(toastId);
+              setCidToSelect(cid);
+            }}
+            style={{ padding: '4px 8px' }}
+          >
+            Change now
+          </button>
         </div>,
+        { closeOnClick: false }
       );
 
       return
@@ -211,8 +248,8 @@ const LaGraphaComponent = ({ maxBlock }) => {
         el.appendChild(tooltipTable)
       };
 
-      if (numEpochsDisplayed === constants.initialBlockRangeLimit){
-        window.graphInstance.fire('zoom-to-point', {y, zoomY })
+      if (numEpochsDisplayed === constants.initialBlockRangeLimit) {
+        window.graphInstance.fire('zoom-to-point', { y, zoomY })
       } else {
         window.graphInstance.fire('zoom-to-node-fct', { nodeY: window.graphInstance.model.nodes[window.graphInstance.model.nodes.length - 3].y, initialPanY: y, zoomY });
       }

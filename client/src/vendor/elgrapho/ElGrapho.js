@@ -292,7 +292,7 @@ ElGrapho.prototype = {
     rulerContext.scale(scale, scale);
     rulerContext.textAlign = 'right';
 
-    const fontSize = 15;
+    const fontSize = 12;
 
     rulerContext.font = `${fontSize}px Arco Perpetuo Pro`;
 
@@ -403,7 +403,7 @@ ElGrapho.prototype = {
 
     labelsContext.save();
 
-    labelsContext.translate(this.width / 2, this.height / 2);
+    labelsContext.translate(halfWidth, halfHeight);
     labelsContext.scale(scale, scale);
     labelsContext.textAlign = 'center';
 
