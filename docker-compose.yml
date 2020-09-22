@@ -61,6 +61,7 @@ services:
       FORCE_COLOR: 1
       HOST: 0.0.0.0
       PORT: 8888
+      SLATE_URL: http://192.168.1.120:4000/api
       VIRTUAL_HOST: server.localtest.me
       VIRTUAL_PORT: 8888
       DATABASE_URL: postgres://user:password@db/lotus

@@ -7,5 +7,6 @@ export const config = {
   port: process.env.PORT || '8888',
   databaseUrl: process.env.DATABASE_URL || 'postgres://user:password@localhost:5432/lotus?sslmode=disable',
   databaseSSL: process.env.DATABASE_SSL || false,
+  slateUrl: process.env.SLATE_URL || '',
   env: process.env.NODE_ENV || 'development',
 }

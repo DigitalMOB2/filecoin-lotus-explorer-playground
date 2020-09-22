@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import { config } from '../../../../config'
 
 export const getChain = async ({ startBlock, endBlock, startDate, endDate, miner, cid, skip, limit, sortOrder }) => {
   const maxLimit = 500
@@ -44,7 +45,7 @@ export const getChain = async ({ startBlock, endBlock, startDate, endDate, miner
     sortOrder = 'DESC'
   }
 
-  const url = `http://192.168.1.120:4000/api/chain_visualizer_chain_data_view?offset=${skip}&limit=${limit}&where=${JSON.stringify(wheres)}`;
+  const url = `${config.slateUrl}/chain_visualizer_chain_data_view?offset=${skip}&limit=${limit}&where=${JSON.stringify(wheres)}`;
   const apiResponse = await fetch(url,
     {
       method: 'get',
@@ -99,7 +100,7 @@ export const getOrphans = async ({ startBlock, endBlock, startDate, endDate, min
     sortOrder = 'DESC'
   }
 
-  const url = `http://192.168.1.120:4000/api/chain_visualizer_orphans_view?offset=${skip}&limit=${limit}&where=${JSON.stringify(wheres)}`;
+  const url = `${config.slateUrl}/chain_visualizer_orphans_view?offset=${skip}&limit=${limit}&where=${JSON.stringify(wheres)}`;
   const apiResponse = await fetch(url,
     {
       method: 'get',
@@ -116,7 +117,7 @@ export const getGraph = async ({ start, end }) => {
   wheres.push(['where', 'height', '>', Number(start)])
   wheres.push(['where', 'height', '<', Number(end)])
 
-  const url = `http://192.168.1.120:4000/api/chain_visualizer_blocks_with_parents_view?where=${JSON.stringify(wheres)}`;
+  const url = `${config.slateUrl}/chain_visualizer_blocks_with_parents_view?where=${JSON.stringify(wheres)}`;
   const apiResponse = await fetch(url,
     {
       method: 'get',

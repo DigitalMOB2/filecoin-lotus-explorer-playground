@@ -1,11 +1,12 @@
 import fetch from 'node-fetch';
+import { config } from '../../../../config'
 
 export const getBlockById = async (id) => {
   let wheres = []
 
   wheres.push(['where', 'block', '=', id])
 
-  const url = `http://192.168.1.120:4000/api/chain_visualizer_blocks_with_parents_view?where=${JSON.stringify(wheres)}`;
+  const url = `${config.slateUrl}/chain_visualizer_blocks_with_parents_view?where=${JSON.stringify(wheres)}`;
   const apiResponse = await fetch(url,
     {
       method: 'get',
@@ -17,7 +18,7 @@ export const getBlockById = async (id) => {
 }
 
 export const getBlockRange = async () => {
-  const url = `http://192.168.1.120:4000/api/chain_visualizer_blocks_view_min_max`;
+  const url = `${config.slateUrl}/chain_visualizer_blocks_view_min_max`;
   const apiResponse = await fetch(url,
     {
       method: 'get',
@@ -34,7 +35,7 @@ export const getBlockHeight = async (id) => {
 
   wheres.push(['where', 'cid', '=', id])
 
-  const url = `http://192.168.1.120:4000/api/chain_visualizer_blocks_view?where=${JSON.stringify(wheres)}`;
+  const url = `${config.slateUrl}/chain_visualizer_blocks_view?where=${JSON.stringify(wheres)}`;
   const apiResponse = await fetch(url,
     {
       method: 'get',
