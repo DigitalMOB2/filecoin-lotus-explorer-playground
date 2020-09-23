@@ -83,7 +83,7 @@ const LaGraphaComponent = ({ maxBlock }) => {
       window.graphInstance.fire('zoom-to-node', { nodeY: model.nodes[index].y, initialPanY: y });
       setCidToSelect(null);
     }
-  }, [loading, cidToSelect, model.nodes]);
+  }, [loading, cidToSelect, model.nodes, y]);
 
   const onSelectNode = async (e) => {
     const cid = e.detail;
@@ -124,6 +124,8 @@ const LaGraphaComponent = ({ maxBlock }) => {
                   Math.max(Number(blockWithHeight.height), constants.initialBlockRangeLimit),
                 ]
               );
+              changeFilter(dispatch, { key: 'startDate', value: null });
+              changeFilter(dispatch, { key: 'endDate', value: null });
               changeFilter(dispatch, { key: 'blockRange', value: newRange });
               toast.dismiss(toastId);
               setCidToSelect(cid);
@@ -241,17 +243,21 @@ const LaGraphaComponent = ({ maxBlock }) => {
         const data = nodes[index];
         const tooltipTable = tooltip(data);
 
-        while (el.firstChild) {
-          el.removeChild(el.firstChild)
-        }
+        if (tooltipTable) {
+          while (el.firstChild) {
+            el.removeChild(el.firstChild)
+          }
 
-        el.appendChild(tooltipTable)
+          el.appendChild(tooltipTable)
+        }
       };
 
       if (numEpochsDisplayed === constants.initialBlockRangeLimit) {
         window.graphInstance.fire('zoom-to-point', { y, zoomY })
       } else {
-        window.graphInstance.fire('zoom-to-node-fct', { nodeY: window.graphInstance.model.nodes[window.graphInstance.model.nodes.length - 3].y, initialPanY: y, zoomY });
+        if (window.graphInstance.model.nodes.length >= 3) {
+          window.graphInstance.fire('zoom-to-node-fct', { nodeY: window.graphInstance.model.nodes[window.graphInstance.model.nodes.length - 3].y, initialPanY: y, zoomY });
+        }
       }
 
       window.graphInstance.on('node-click', ({ node }) => {
