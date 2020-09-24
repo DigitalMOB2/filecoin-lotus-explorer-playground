@@ -37,7 +37,7 @@ export const getChainLoadMore = async (crtChainData, originalPositions, { blockR
     node.y = originalPositions[index].y;
   });
 
-  const {chain, orphans} = mergeDataSets(crtChainData, newChainData, up, totalEpochs - 1);
+  const { chain, orphans } = mergeDataSets(crtChainData, newChainData, up, totalEpochs - 1);
   const miners = mapMiners(chain);
   const timeToReceive = mapTimeToReceive(chain);
 
@@ -152,9 +152,9 @@ const mergeDataSets = (set1, set2, up, sets) => {
   let lastEpochInSet2 = 0;
   set2.chain.nodes.forEach(node => {
     if (up) {
-      if (lastEpochInSet2*1 > node.height*1) lastEpochInSet2 = node.height;
+      if (lastEpochInSet2 * 1 > node.height * 1) lastEpochInSet2 = node.height;
     } else {
-      if (lastEpochInSet2*1 < node.height*1) lastEpochInSet2 = node.height;
+      if (lastEpochInSet2 * 1 < node.height * 1) lastEpochInSet2 = node.height;
     }
   });
 
@@ -194,8 +194,21 @@ const mergeDataSets = (set1, set2, up, sets) => {
   const yOffset = 1;
 
   if (up) {
+
+    let ymax = 0;
+    let ymin = 0;
+
+    set1Processed.chain.nodes.forEach(node => {
+      if (ymax < node.y) ymax = node.y;
+      if (ymin > node.y) ymin = node.y;
+    });
+
+    const heights1 = getSetHeights(set1Processed);
+    const heights2 = getSetHeights(set2Processed);
+    const step = 1 / heights1.length;
+
     set2Processed.chain.nodes.forEach(node => {
-      node.y = yOffset + node.y / sets;
+      node.y = ymax + heights2.findIndex((height) => height === node.height) * step;
     });
   } else {
     const heights = getSetHeights(set1Processed);
@@ -214,11 +227,11 @@ const mergeDataSets = (set1, set2, up, sets) => {
     orphans: set1Processed.orphans.concat(set2Processed.orphans)
   };
 
-  Object.keys(set2Processed.chain.miners).forEach ( minerId => {
+  Object.keys(set2Processed.chain.miners).forEach(minerId => {
     if (result.chain.miners[minerId]) {
-        result.chain.miners[minerId] += set2Processed.chain.miners[minerId];
+      result.chain.miners[minerId] += set2Processed.chain.miners[minerId];
     } else {
-        result.chain.miners[minerId] = set2Processed.chain.miners[minerId];
+      result.chain.miners[minerId] = set2Processed.chain.miners[minerId];
     }
   });
 

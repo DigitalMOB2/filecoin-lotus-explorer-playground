@@ -37,7 +37,7 @@ export const loadMoreData = async (dispatch, previousChain, originalPositions, p
 
       newRange[0] = payload.blockRange[0];
       newRange[1] = localPayload.blockRange[1];
-      totalEpochs = localPayload.blockRange[1] - payload.blockRange[0];
+      totalEpochs = newRange[1] - newRange[0];
     } else {
       localPayload.blockRange[1] = localPayload.blockRange[0];
       const min = localPayload.blockRange[0] - constants.initialBlockRangeLimit;
@@ -45,6 +45,7 @@ export const loadMoreData = async (dispatch, previousChain, originalPositions, p
 
       newRange[0] = localPayload.blockRange[0];
       newRange[1] = payload.blockRange[1];
+      totalEpochs = newRange[1] - newRange[0];
     }
 
     dispatch({ type: 'CHANGE_RANGE', payload: { range: newRange } });
