@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { RangeInputs } from './range-inputs.styled'
 import { constants } from '../../../../utils/constants'
 
-const RangeInputsComponent = ({ rangeIntervals, onChange }) => {
+const RangeInputsComponent = ({ minValue, maxValue, rangeIntervals, onChange }) => {
   const [min, setMin] = useState(rangeIntervals[0])
   const [max, setMax] = useState(rangeIntervals[1])
 
@@ -26,21 +26,40 @@ const RangeInputsComponent = ({ rangeIntervals, onChange }) => {
   }
 
   const updateMin = (e) => {
-    const min = Number(e.target.value);
-    if (min + constants.initialBlockRangeLimit > max) {
-      setMax(min + constants.initialBlockRangeLimit);
+    e.preventDefault();
+    const value = Number(e.target.value);
+
+    if (!Number.isInteger(value)) {
+      return;
     }
 
-    setMin(min);
+    if (value + constants.maxBlockRange < max) {
+      setMax(Math.min(maxValue, value + constants.maxBlockRange));
+    }
+
+    if (value >= max) {
+      setMax(Math.min(maxValue, value + constants.initialBlockRangeLimit));
+    }
+
+    setMin(Math.max(minValue, Math.min(maxValue - constants.initialBlockRangeLimit, value)));
   }
 
   const updateMax = (e) => {
-    const max = Number(e.target.value);
-    if (max - constants.initialBlockRangeLimit > min) {
-      setMin(max - constants.initialBlockRangeLimit);
+    e.preventDefault();
+    const value = Number(e.target.value);
+
+    if (!Number.isInteger(value)) {
+      return;
     }
 
-    setMax(max);
+    if (min + constants.maxBlockRange < value) {
+      setMin(Math.max(minValue, Math.min(maxValue - constants.initialBlockRangeLimit,  value - constants.maxBlockRange)));
+    }
+    if (value <= min) {
+      setMin(Math.max(minValue, value - constants.initialBlockRangeLimit));
+    }
+
+    setMax(Math.min(maxValue, value));
   }
 
   return (

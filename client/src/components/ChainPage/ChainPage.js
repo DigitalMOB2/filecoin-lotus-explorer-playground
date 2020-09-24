@@ -56,7 +56,7 @@ const ChainPageComponent = () => {
           <Range minBlock={minBlock} maxBlock={maxBlock} />
         </RangeContainer>
       </ChartAndRange>
-      <Controls maxBlock={maxBlock} />
+      <Controls minBlock={minBlock} maxBlock={maxBlock} />
       <div className="d3-tooltip" />
     </ChainPage>
   )

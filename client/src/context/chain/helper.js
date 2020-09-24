@@ -1,5 +1,6 @@
 import { getChainData } from '../../api'
 import { palette } from '../../utils/palette'
+import { constants } from '../../utils/constants';
 
 export const getChain = async ({ blockRange, startDate, endDate, miner, cid }) => {
   const { chain, orphans } = await getChainData({
@@ -178,31 +179,29 @@ const mergeDataSets = (set1, set2, up, sets) => {
   const set1Processed = { ...set1 };
   set1Processed.chain.nodes = set1FilteredNodes;
 
-  let yOffset = 0;
+  const getSetHeights = (set) => {
+    const heights = [];
+    set.chain.nodes.forEach(node => {
+      if (!heights.includes(node.height)) {
+        heights.push(node.height);
+      }
+    });
+    heights.sort((a, b) => Number(a) - Number(b));
 
-  let ymax = 0;
-  let ymin = 0;
+    return heights;
+  };
+
+  const yOffset = 1;
 
   if (up) {
-    set2.chain.nodes.forEach(node => {
-      if (ymax < node.y) ymax = node.y;
-      if (ymin > node.y) ymin = node.y;
-    });
-    //yOffset = ymax - ymin;
-    yOffset = sets;
     set2Processed.chain.nodes.forEach(node => {
-      node.y = node.y + yOffset;
+      node.y = yOffset + node.y / sets;
     });
   } else {
-    set1.chain.nodes.forEach(node => {
-      if (ymax < node.y) ymax = node.y;
-      if (ymin > node.y) ymin = node.y;
-    });
+    const heights = getSetHeights(set1Processed);
 
-    //yOffset = ymax - ymin;
-    yOffset = 1;
     set1Processed.chain.nodes.forEach(node => {
-      node.y = node.y + yOffset;
+      node.y = yOffset + heights.findIndex((height) => height === node.height) / constants.initialBlockRangeLimit;
     });
   }
 

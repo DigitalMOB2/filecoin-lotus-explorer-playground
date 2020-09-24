@@ -21,7 +21,7 @@ const nodeLabelOptions = [
   // { value: 'disableTipsetColor', label: 'Disable tipset color', disabled: true },
 ]
 
-const ControlsComponent = ({ maxBlock }) => {
+const ControlsComponent = ({ minBlock, maxBlock }) => {
   const {
     state: { chain, filter, range },
     dispatch,
@@ -77,7 +77,12 @@ const ControlsComponent = ({ maxBlock }) => {
       <Block>
         <Title>Block Height</Title>
         <DashedLine />
-        <RangeInputs rangeIntervals={range} onChange={onChangeRangeInput} />
+        <RangeInputs
+          minValue={minBlock}
+          maxValue={maxBlock}
+          rangeIntervals={range}
+          onChange={onChangeRangeInput}
+        />
         <DashedLine />
         {options}
       </Block>
