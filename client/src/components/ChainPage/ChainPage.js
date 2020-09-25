@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import { getBlockRange } from '../../api'
-import { changeFilter as changeFilterAction } from '../../context/filter/actions'
+import { changeFilters as changeFiltersAction } from '../../context/filter/actions'
 import { store } from '../../context/store'
 import { constants } from '../../utils'
 import { ChainPage, ChartAndRange, RangeContainer } from './chain-page.styled'
@@ -14,7 +14,7 @@ const ChainPageComponent = () => {
   const { startDate, endDate, blockRange, miner, minBlock, maxBlock } = state.filter
 
   const changeFilter = (payload) => {
-    changeFilterAction(dispatch, payload)
+    changeFiltersAction(dispatch, payload)
   }
 
   useEffect(() => {
@@ -24,17 +24,14 @@ const ChainPageComponent = () => {
 
         if (res && res.minHeight) {
           if (res.minHeight) {
-            changeFilter({ key: 'minBlock', value: Number(res.minHeight) })
+            changeFilter({ minBlock: Number(res.minHeight) })
           }
 
           if (res.maxHeight) {
             const _maxBlock = Number(res.maxHeight)
 
-            changeFilter({ key: 'maxBlock', value: _maxBlock })
-            changeFilter({
-              key: 'blockRange',
-              value: [Math.max(0, _maxBlock - constants.initialBlockRangeLimit), _maxBlock],
-            })
+            changeFilter({ maxBlock: _maxBlock })
+            changeFilter({ blockRange: [Math.max(0, _maxBlock - constants.initialBlockRangeLimit), _maxBlock] })
           }
         }
       } catch (error) {

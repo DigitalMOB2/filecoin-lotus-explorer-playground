@@ -4,11 +4,11 @@ import findLastIndex from 'lodash/findLastIndex'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import { getBlockHeight } from '../../../api'
-import { fetchGraph, loadMoreData } from '../../../context/chain/actions'
+import { fetchGraph, loadMoreData, skipFetch as skipFetchAction } from '../../../context/chain/actions'
 import { closeNodeModal, openNodeModal } from '../../../context/node-modal/actions'
 import { selectNode } from '../../../context/selected-node/actions'
 import { store } from '../../../context/store'
-import { changeFilter } from '../../../context/filter/actions';
+import { changeFilters } from '../../../context/filter/actions';
 import { changeRange } from "../../../context/range/actions";
 import ElGrapho from '../../../vendor/elgrapho/ElGrapho'
 import { Loader } from '../../shared/Loader'
@@ -28,11 +28,10 @@ import { config } from '../../../config'
 
 const LaGraphaComponent = ({ maxBlock }) => {
   const { state, dispatch } = useContext(store);
-  const { chain, originalPositions, loading: loadingData, filter, selectedNode, isNodeModalOpen } = state;
+  const { chain, originalPositions, loading: loadingData, filter, selectedNode, isNodeModalOpen, skipFetch } = state;
   const { blockRange, startDate, endDate, miner, cid, showHeightRuler } = filter;
 
   const [loadingGraph, setLoading] = useState(false);
-  const [skipFetchGraph, setSkipFetchGraph] = useState(false);
   const [cidToSelect, setCidToSelect] = useState(null);
   //old export canvas as png
   //const [buildingSvg, setBuildingSvg] = useState(false)
@@ -124,9 +123,7 @@ const LaGraphaComponent = ({ maxBlock }) => {
                   Math.max(Number(blockWithHeight.height), constants.initialBlockRangeLimit),
                 ]
               );
-              changeFilter(dispatch, { key: 'startDate', value: null });
-              changeFilter(dispatch, { key: 'endDate', value: null });
-              changeFilter(dispatch, { key: 'blockRange', value: newRange });
+              changeFilters(dispatch, { startDate: null, endDate: null, blockRange: newRange });
               toast.dismiss(toastId);
               setCidToSelect(cid);
             }}
@@ -166,7 +163,7 @@ const LaGraphaComponent = ({ maxBlock }) => {
   });
 
   useEffect(() => {
-    if (!blockRange[1] || skipFetchGraph) return;
+    if (!blockRange[1] || skipFetch) return;
     fetchGraph(dispatch, { blockRange, startDate, endDate, miner, cid })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blockRange, startDate, endDate, miner, cid]);
@@ -210,9 +207,10 @@ const LaGraphaComponent = ({ maxBlock }) => {
     const { nodes } = chain.chain;
 
     const onLoadMoreData = ({ up }) => {
-      setSkipFetchGraph(true);
       const payload = { blockRange, startDate, endDate, miner, cid, up, maxBlock };
-      loadMoreData(dispatch, chain, originalPositions, payload).then(() => setSkipFetchGraph(false));
+      skipFetchAction(dispatch, true);
+      loadMoreData(dispatch, chain, originalPositions, payload);
+      skipFetchAction(dispatch, false);
     };
 
     if (nodes.length > 0) {

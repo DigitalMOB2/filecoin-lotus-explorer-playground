@@ -1,6 +1,10 @@
-import { getChain, getChainLoadMore, saveNodeOriginalPositions } from './helper'
+import { getChain, getChainLoadMore, saveNodeOriginalPositions, getSetHeights } from './helper'
 import { toast } from 'react-toastify'
 import { constants } from '../../utils'
+
+export const skipFetch = (dispatch, payload) => {
+  dispatch({ type: 'SKIP_FETCH', payload });
+};
 
 export const fetchGraph = async (dispatch, payload) => {
   dispatch({ type: 'CHANGE_LOADING', payload: true })
@@ -13,6 +17,11 @@ export const fetchGraph = async (dispatch, payload) => {
       dispatch({ type: 'STORE_ORIGINAL_POSITIONS', payload: originalPositions })
     }
 
+    if (payload.startDate && payload.endDate) {
+      const heights = getSetHeights(chain);
+      const range = [Number(heights[0]), Number(heights[heights.length - 1])];
+      dispatch({ type: 'CHANGE_RANGE', payload: { range } });
+    }
     dispatch({ type: 'CHANGE_CHAIN', payload: chain })
   } catch (error) {
     console.error('Error in request', error)
@@ -37,7 +46,7 @@ export const loadMoreData = async (dispatch, previousChain, originalPositions, p
 
       newRange[0] = payload.blockRange[0];
       newRange[1] = localPayload.blockRange[1];
-      totalEpochs = localPayload.blockRange[1] - payload.blockRange[0];
+      totalEpochs = newRange[1] - newRange[0];
     } else {
       localPayload.blockRange[1] = localPayload.blockRange[0];
       const min = localPayload.blockRange[0] - constants.initialBlockRangeLimit;
@@ -45,10 +54,11 @@ export const loadMoreData = async (dispatch, previousChain, originalPositions, p
 
       newRange[0] = localPayload.blockRange[0];
       newRange[1] = payload.blockRange[1];
+      totalEpochs = newRange[1] - newRange[0];
     }
 
     dispatch({ type: 'CHANGE_RANGE', payload: { range: newRange } });
-    dispatch({ type: 'CHANGE_FILTER', payload: { key: 'blockRange', value: newRange } });
+    dispatch({ type: 'CHANGE_FILTERS', payload: { blockRange: newRange } });
 
     const chain = await getChainLoadMore(previousChain, originalPositions, localPayload, payload.up, totalEpochs / constants.initialBlockRangeLimit);
 
