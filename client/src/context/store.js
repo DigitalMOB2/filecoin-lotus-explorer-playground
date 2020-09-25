@@ -6,6 +6,7 @@ const initialState = {
   selectedNode: {},
   isNodeModalOpen: false,
   loading: false,
+  skipFetch: false,
   chain: {
     chain: {
       nodes: [],
@@ -94,15 +95,18 @@ const StateProvider = ({ children }) => {
           ...state,
           chain: action.payload,
         }
-      case 'CHANGE_FILTER':
-        const { key: filterKey, value: filterValue } = action.payload
-
+      case 'CHANGE_FILTERS':
         return {
           ...state,
           filter: {
             ...state.filter,
-            [filterKey]: filterValue,
+            ...action.payload,
           },
+        }
+      case 'SKIP_FETCH':
+        return {
+          ...state,
+          skipFetch: action.payload,
         }
       default:
         throw new Error()

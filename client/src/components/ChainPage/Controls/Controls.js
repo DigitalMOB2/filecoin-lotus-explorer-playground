@@ -1,17 +1,17 @@
 import debounce from 'lodash/debounce'
 import React, { Fragment, useContext, useEffect } from 'react'
 import 'react-datepicker/dist/react-datepicker.css'
-import { changeFilter as changeFilterAction } from '../../../context/filter/actions'
+import { changeFilters as changeFiltersAction } from '../../../context/filter/actions'
 import { changeRange } from '../../../context/range/actions'
 import { store } from '../../../context/store'
 import { constants } from '../../../utils'
 import { Block } from '../../shared/Block'
-import { DatePicker } from '../../shared/DatePicker'
 import { Input } from '../../shared/Input'
-import { Controls, DashedLine, Title } from './controls.styled'
+import { Controls, DashedLine, Title, ClearButton } from './controls.styled'
 import { FilterItem } from './FilterItem'
 import { Miners } from './Miners'
 import { RangeInputs } from './RangeInputs'
+import { DateInputs } from './DateInputs'
 import { ReceivedBlocks } from './ReceivedBlocks'
 
 const nodeLabelOptions = [
@@ -64,8 +64,18 @@ const ControlsComponent = ({ minBlock, maxBlock }) => {
 
     if (allEmpty || notChanged) return
 
-    changeFilterAction(dispatch, { key, value })
+    changeFiltersAction(dispatch, { [key]: value, startDate: null,  endDate: null})
   }
+
+  const changeDate = debounce((startDate, endDate) => {
+    const payload = { startDate, endDate, blockRange: [minBlock, maxBlock] };
+    console.log(payload)
+    changeFiltersAction(dispatch, payload);
+  }, 500);
+
+  const onClearDateFilter = () => {
+    changeFiltersAction(dispatch, { startDate: '', endDate: '', blockRange: [maxBlock - constants.initialBlockRangeLimit, maxBlock] });
+  };
 
   return (
     <Controls id="controls">
@@ -75,28 +85,32 @@ const ControlsComponent = ({ minBlock, maxBlock }) => {
         </Block>
       )}
       <Block>
-        <Title>Block Height</Title>
+        <Title>Block Height (max range 5000)</Title>
         <DashedLine />
         <RangeInputs
-          minValue={minBlock}
-          maxValue={maxBlock}
-          rangeIntervals={range}
+          minBlock={minBlock}
+          maxBlock={maxBlock}
+          range={range}
           onChange={onChangeRangeInput}
         />
         <DashedLine />
         {options}
       </Block>
       <Block>
-        <Title>Narrow date range</Title>
-        <DatePicker
-          selected={filter.startDate}
-          onChange={(date) => changeFilter('startDate', date)}
-          placeholderText="Start date, mm/dd/yyyy"
-        />
-        <DatePicker
-          selected={filter.endDate}
-          onChange={(date) => changeFilter('endDate', date)}
-          placeholderText="End date, mm/dd/yyyy"
+        <Title>
+          <span>Narrow date range (max 48h)</span>
+          {filter.startDate || filter.startDate ? (
+            <ClearButton
+              type="button"
+              title="Clear date filter"
+              onClick={onClearDateFilter}
+            />
+          ) : null}
+        </Title>
+        <DateInputs
+          maxTimeDiff={48} // in hours
+          filter={filter}
+          onChange={changeDate}
         />
       </Block>
       <Block>
