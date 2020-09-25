@@ -2,7 +2,7 @@ import debounce from 'lodash/debounce'
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
 import React, { useContext, useEffect } from 'react'
-import { changeFilter } from '../../../context/filter/actions'
+import { changeFilters } from '../../../context/filter/actions'
 import { changeRange } from '../../../context/range/actions'
 import { store } from '../../../context/store'
 import { constants } from '../../../utils'
@@ -15,7 +15,7 @@ const RangeComponent = ({ minBlock, maxBlock }) => {
   const { range } = state
 
   const debouncedBlockRangeChange = debounce((blockRange) => {
-    changeFilter(dispatch, { key: 'blockRange', value: blockRange })
+    changeFilters(dispatch, { blockRange })
   }, 500)
 
   useEffect(() => {

@@ -3,8 +3,12 @@ import { palette } from '../../utils/palette'
 import { constants } from '../../utils/constants';
 
 export const getChain = async ({ blockRange, startDate, endDate, miner, cid }) => {
+  if (startDate && endDate) {
+    blockRange = null;
+  }
+
   const { chain, orphans } = await getChainData({
-    blockRange: [blockRange[0], blockRange[1]],
+    blockRange,
     startDate,
     endDate,
     miner,
@@ -130,6 +134,18 @@ const mapMiners = (chain) => {
   return minersWithColor
 }
 
+export const getSetHeights = (set) => {
+  const heights = [];
+  set.chain.nodes.forEach(node => {
+    if (node.height && !heights.includes(node.height)) {
+      heights.push(node.height);
+    }
+  });
+  heights.sort((a, b) => Number(a) - Number(b));
+
+  return heights;
+};
+
 const mergeDataSets = (set1, set2, up, sets) => {
   const edgeNodeCID = {};
   set1.chain.edges.forEach((edge, index) => {
@@ -178,18 +194,6 @@ const mergeDataSets = (set1, set2, up, sets) => {
 
   const set1Processed = { ...set1 };
   set1Processed.chain.nodes = set1FilteredNodes;
-
-  const getSetHeights = (set) => {
-    const heights = [];
-    set.chain.nodes.forEach(node => {
-      if (!heights.includes(node.height)) {
-        heights.push(node.height);
-      }
-    });
-    heights.sort((a, b) => Number(a) - Number(b));
-
-    return heights;
-  };
 
   const yOffset = 1;
 

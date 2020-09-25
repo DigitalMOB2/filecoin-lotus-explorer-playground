@@ -448,10 +448,6 @@ ElGrapho.prototype = {
 
       let node, x, y;
 
-      if (!this.model.nodes[hoverIndex].id) {
-        return
-      }
-
       // hover ring
       if (hoverIndex >= 0) {
         node = this.model.nodes[hoverIndex];
