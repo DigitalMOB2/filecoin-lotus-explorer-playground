@@ -381,8 +381,8 @@ WebGL.prototype = {
 
     gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, projectionMatrix)
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix)
-    gl.uniform1i(shaderProgram.magicZoom, magicZoom)
-    gl.uniform1f(shaderProgram.glowSize, nodeSize * 2)
+    gl.uniform1i(shaderProgram.magicZoom, false)
+    gl.uniform1f(shaderProgram.glowSize, nodeSize)
     gl.uniform1f(shaderProgram.focusedGroup, focusedGroup)
     gl.uniform1f(shaderProgram.zoom, zoom)
     gl.uniform1f(shaderProgram.globalAlpha, 1)

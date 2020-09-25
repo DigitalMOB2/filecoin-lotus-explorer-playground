@@ -37,6 +37,9 @@ services:
       VIRTUAL_HOST: site.localtest.me
       VIRTUAL_PORT: 3000
       REACT_APP_API_URL: http://server.localtest.me/api
+      REACT_APP_NETWORK: testnet
+      REACT_APP_EXPLORER_PREFIX: https://filscan.io/
+
 
   server:
     build:

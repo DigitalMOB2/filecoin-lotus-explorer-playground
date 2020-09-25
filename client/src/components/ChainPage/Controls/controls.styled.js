@@ -47,7 +47,50 @@ export const Title = styled.h3`
   letter-spacing: 0.02em;
   margin-bottom: 8px;
   text-transform: uppercase;
+  display: flex;
+  align-items: center;
+
+  &:only-child {
+    margin-bottom: 0;
+  }
 `
+
+export const ClearButton = styled.button`
+  background: transparent;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+  position: relative;
+  transition: opacity 0.1s ease-out;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  &::before,
+  &::after {
+    content: '';
+    width: 2px;
+    height: 14px;
+    position: absolute;
+    top: 1px;
+    left: calc(50% - 1px);
+    display: block;
+    background: #000;
+  }
+  &::before {
+    transform: rotate(45deg);
+  }
+  &::after {
+    transform: rotate(-45deg);
+  }
+`;
 
 export const Description = styled.p`
   font-size: 12px;

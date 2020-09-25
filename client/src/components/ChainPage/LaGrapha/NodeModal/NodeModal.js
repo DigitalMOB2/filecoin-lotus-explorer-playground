@@ -4,12 +4,12 @@ import { Block, CloseButton, Content, NodeModal, Title, PurpleLink } from './nod
 import { DateTime } from 'luxon'
 
 const NodeModalComponent = ({ node, close }) => {
-  const timestamp = DateTime.fromSeconds(Number(node.timestamp)).toLocaleString(DateTime.DATETIME_MED)
+  const timestamp = DateTime.fromSeconds(Number(node.timestamp)).toFormat('MM/dd/yy, hh:mm:ss a');
 
   const data = [
     { title: 'Hash', key: 'id' },
     { title: 'Height', key: 'height' },
-    { title: 'Timestamp', value: timestamp },
+    { title: 'Timestamp', value: `${node.timestamp} (${timestamp})` },
     { title: 'Block Size', key: '' },
     { title: 'Messages', key: 'messages' },
     { title: 'Reward', key: '' },
@@ -20,7 +20,7 @@ const NodeModalComponent = ({ node, close }) => {
   ]
 
   const openFilscan = () => {
-    const link = ` https://filscan.io/#/tipset?hash=${node.id}`
+    const link = `${process.env.REACT_APP_EXPLORER_PREFIX}#/tipset?hash=${node.id}`
 
     window.open(link)
   }

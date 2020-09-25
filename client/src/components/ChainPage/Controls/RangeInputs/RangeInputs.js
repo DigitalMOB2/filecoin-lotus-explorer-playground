@@ -1,49 +1,66 @@
-import React, { useState, useEffect } from 'react'
-import { RangeInputs } from './range-inputs.styled'
-import { constants } from '../../../../utils/constants'
+import React, { useState, useEffect } from 'react';
+import { RangeInputs } from './range-inputs.styled';
 
-const RangeInputsComponent = ({ rangeIntervals, onChange }) => {
-  const [min, setMin] = useState(rangeIntervals[0])
-  const [max, setMax] = useState(rangeIntervals[1])
+const RangeInputsComponent = ({ range, minBlock, maxBlock, onChange }) => {
+  const [min, setMin] = useState(range[0]);
+  const [max, setMax] = useState(range[1]);
 
   useEffect(() => {
-    setMin(rangeIntervals[0])
-    setMax(rangeIntervals[1])
-
+    setMin(range[0]);
+    setMax(range[1]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, rangeIntervals)
+  }, range);
+
+  const onSubmit = () => {
+    if (min !== range[0] || max !== range[1]) {
+      onChange([min,  max])
+    }
+  };
+
+  const handlerBlur = () => {
+    onSubmit();
+  };
 
   const onKeyPress = (e) => {
     if (e.which === 13) {
-      onSubmit()
+      onSubmit();
     }
-  }
+  };
 
-  const onSubmit = () => {
-    if (min === rangeIntervals[0] && max === rangeIntervals[1]) return
+  const handlerChange = (key, event) => {
+    event.preventDefault();
+    const value = Number(event.target.value);
 
-    onChange([Number(min), Number(max)])
-  }
-
-  const updateMinMax = (max) => {
-    let min = max - constants.initialBlockRangeLimit;
-    if (min < 0) min = 0;
-    setMax(max);
-    setMin(min);
-  }
+    if (Number.isInteger(value) && value >= 0) {
+      if (key === 'min') {
+        setMin(Math.max(minBlock, value));
+      }
+      if (key === 'max') {
+        setMax(Math.min(maxBlock, value));
+      }
+    }
+  };
 
   return (
-    <RangeInputs>
+    <RangeInputs onBlur={handlerBlur}>
       <div>
-        <input value={min} />
+        <input
+          value={min}
+          onKeyPress={onKeyPress}
+          onChange={(e) => handlerChange('min', e)}
+        />
         <span>Min</span>
       </div>
       <div>
-        <input value={max} onKeyPress={onKeyPress} onBlur={onSubmit} onChange={(e) => updateMinMax(e.target.value) } />
+        <input
+          value={max}
+          onKeyPress={onKeyPress}
+          onChange={(e) => handlerChange('max', e)}
+        />
         <span>Max</span>
       </div>
     </RangeInputs>
   )
-}
+};
 
-export { RangeInputsComponent as RangeInputs }
+export { RangeInputsComponent as RangeInputs };
