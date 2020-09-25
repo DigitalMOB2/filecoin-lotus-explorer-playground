@@ -448,7 +448,7 @@ ElGrapho.prototype = {
 
       let node, x, y;
 
-      if (!this.model.nodes[hoverIndex].id) {
+      if (this.model.nodes[hoverIndex] && !this.model.nodes[hoverIndex].id) {
         return
       }
 
