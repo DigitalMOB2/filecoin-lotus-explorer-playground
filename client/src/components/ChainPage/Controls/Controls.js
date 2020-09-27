@@ -1,6 +1,8 @@
 import debounce from 'lodash/debounce'
 import React, { Fragment, useContext, useEffect } from 'react'
+import { toast } from 'react-toastify';
 import 'react-datepicker/dist/react-datepicker.css'
+import { getBlockRangeByDate } from '../../../api';
 import { changeFilters as changeFiltersAction } from '../../../context/filter/actions'
 import { changeRange } from '../../../context/range/actions'
 import { store } from '../../../context/store'
@@ -64,17 +66,26 @@ const ControlsComponent = ({ minBlock, maxBlock }) => {
 
     if (allEmpty || notChanged) return
 
-    changeFiltersAction(dispatch, { [key]: value, startDate: null,  endDate: null})
+    changeFiltersAction(dispatch, { [key]: value, startDate: null,  endDate: null })
   }
 
-  const changeDate = debounce((startDate, endDate) => {
-    const payload = { startDate, endDate, blockRange: [minBlock, maxBlock] };
-    console.log(payload)
-    changeFiltersAction(dispatch, payload);
-  }, 500);
-
   const onClearDateFilter = () => {
-    changeFiltersAction(dispatch, { startDate: '', endDate: '', blockRange: [maxBlock - constants.initialBlockRangeLimit, maxBlock] });
+    const payload = { startDate: '', endDate: '', blockRange: [maxBlock - constants.initialBlockRangeLimit, maxBlock] };
+    changeRange(dispatch, range,  [maxBlock - constants.initialBlockRangeLimit, maxBlock]);
+    changeFiltersAction(dispatch, payload);
+  };
+
+  const changeDate = async (startDate, endDate) => {
+    if (!startDate || !endDate) return;
+
+    try {
+      const range = await getBlockRangeByDate({ startDate, endDate });
+      const payload = { startDate, endDate, blockRange: [Number(range.minBlock), Number(range.maxBlock)] };
+      changeRange(dispatch, range,  [Number(range.minBlock), Number(range.maxBlock)]);
+      changeFiltersAction(dispatch, payload);
+    } catch (e) {
+      toast.warn('This date range was not found in our database.');
+    }
   };
 
   return (

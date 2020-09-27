@@ -2,12 +2,8 @@ import axios from 'axios'
 import { config } from '../config'
 
 export const getChainData = async ({ blockRange, startDate, endDate, miner, cid }) => {
-  let startBlock = null;
-  let endBlock = null;
-  if (blockRange) {
-    startBlock = blockRange[0];
-    endBlock = blockRange[1];
-  }
+  const startBlock = blockRange[0];
+  const endBlock = blockRange[1];
 
   const { data } = await axios.get(`${config.apiUrl}/chain`, {
     params: {
@@ -28,6 +24,17 @@ export const getBlockRange = async () => {
 
   return data
 }
+
+export const getBlockRangeByDate = async ({ startDate, endDate }) => {
+  const { data } = await axios.get(`${config.apiUrl}/blocks/height/byDate`, {
+    params: {
+      startDate,
+      endDate,
+    }
+  });
+
+  return data
+};
 
 export const getBlockHeight = async ({ cid }) => {
   const { data } = await axios.get(`${config.apiUrl}/blocks/height/${cid}`)
