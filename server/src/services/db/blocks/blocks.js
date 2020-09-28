@@ -52,7 +52,7 @@ export const getHeightByDate = async ({ startDate, endDate }) => {
     let date = new Date(startDate)
     let seconds = date.getTime() / 1000
     let wheres = []
-    wheres.push(['where', 'timestamp', '>=', seconds])
+    wheres.push(['where', 'timestamp', '>', seconds])
 
     const url = `${config.slateUrl}/chain_visualizer_blocks_view?where=${JSON.stringify(wheres)}&limit=1&sort=${JSON.stringify([['height', 'asc']])}`;
     const apiResponse = await fetch(url,
@@ -69,7 +69,7 @@ export const getHeightByDate = async ({ startDate, endDate }) => {
     let date = new Date(endDate)
     let seconds = date.getTime() / 1000
     let wheres = []
-    wheres.push(['where', 'timestamp', '<=', seconds])
+    wheres.push(['where', 'timestamp', '<', seconds])
 
     const url = `${config.slateUrl}/chain_visualizer_blocks_view?where=${JSON.stringify(wheres)}&limit=1&sort=${JSON.stringify([['height', 'desc']])}`;
     const apiResponse = await fetch(url,
