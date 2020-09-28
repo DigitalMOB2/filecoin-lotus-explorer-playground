@@ -63,7 +63,7 @@ if (startDate) {
     FROM
       chain_visualizer_blocks_view
     WHERE
-    timestamp >= $1
+    timestamp > $1
     order by
       height
     LIMIT 1
@@ -85,7 +85,7 @@ if (endDate) {
     FROM
       chain_visualizer_blocks_view
     WHERE
-    timestamp <= $1
+    timestamp < $1
     order by
       height DESC
     LIMIT 1
