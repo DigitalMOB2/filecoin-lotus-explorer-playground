@@ -1,22 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { DatePicker } from '../../../shared/DatePicker'
+import React, { useState, useEffect, useCallback } from 'react';
+import { DatePicker } from '../../../shared/DatePicker';
+import debounce from 'lodash/debounce';
+import { DateTime } from 'luxon';
 
 const DateInputsComponent = ({ filter, maxTimeDiff, onChange }) => {
   const [startDate, setStartDate] = useState(filter.startDate);
   const [endDate, setEndDate] = useState(filter.endDate);
-
-  const maxTimeDiffInMs = maxTimeDiff * 60 * 60 * 1000;
-  const timeInterval = 30; // in minutes
+  const [calendarIsOpen, setCalendarIsOpen] = useState(false);
+  const [validator, setValidator] = useState({ isSameDates: false, isValidDates: false, isDatesChanged: false });
 
   useEffect(() => {
     setStartDate(filter.startDate);
     setEndDate(filter.endDate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter.startDate, filter.endDate]);
+  }, [+filter.startDate, +filter.endDate]);
+
+  useEffect(() => {
+    const isSameDates = DateTime.fromJSDate(startDate).equals(DateTime.fromJSDate(endDate));
+    const isValidDates = DateTime.fromJSDate(startDate).isValid && DateTime.fromJSDate(endDate).isValid;
+    const isDatesChanged = !DateTime.fromJSDate(filter.startDate).equals(DateTime.fromJSDate(startDate))
+      || !DateTime.fromJSDate(filter.endDate).equals(DateTime.fromJSDate(endDate));
+
+    setValidator({ isSameDates, isValidDates, isDatesChanged });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [+startDate, +endDate]);
 
   const onSubmit = () => {
-    if (startDate && endDate && (+startDate !== +filter.startDate || +endDate !== +filter.endDate)) {
-      if (startDate.getTime() > endDate.getTime()) {
+    const { isSameDates, isValidDates, isDatesChanged } = validator;
+
+    if (!calendarIsOpen && !isSameDates && isValidDates && isDatesChanged) {
+      if (+startDate > +endDate) {
         let temp = startDate;
         setStartDate(endDate);
         setEndDate(temp);
@@ -25,42 +38,44 @@ const DateInputsComponent = ({ filter, maxTimeDiff, onChange }) => {
     }
   };
 
-  const handlerBlur = () => {
-    onSubmit();
-  };
+  const debounced = useCallback(debounce(onSubmit, 1000), [+startDate, +endDate, calendarIsOpen]);
 
-  const onKeyDown = (e) => {
-    if (e.which === 13) {
-      if (startDate && !endDate) {
-        setEndDate(new Date(startDate.getTime() + maxTimeDiffInMs));
-      }
-      onSubmit();
-    }
-  };
+  useEffect(() => {
+    debounced();
 
+    return debounced.cancel;
+  }, [debounced, calendarIsOpen]);
 
   return (
-    <div onBlur={handlerBlur}>
+    <div>
       <DatePicker
         selected={startDate}
+        value={startDate}
         onChange={(date) => setStartDate(date)}
         placeholderText="Start date, mm/dd/yyyy"
         dateFormat="MM/dd/yyyy, h:mm aa"
         showTimeInput
-        onKeyDown={onKeyDown}
-        timeIntervals={timeInterval}
+        onCalendarClose={() => setCalendarIsOpen(false)}
+        onCalendarOpen={() => setCalendarIsOpen(true)}
+        selectsStart
+        startDate={startDate}
+        endDate={endDate}
       />
       <DatePicker
         selected={endDate}
+        value={endDate}
         onChange={(date) => setEndDate(date)}
-        placeholderText={startDate ? 'End date, mm/dd/yyyy' : 'Select Start date'}
+        placeholderText={DateTime.fromJSDate(startDate).isValid ? 'End date, mm/dd/yyyy' : 'Select Start date'}
         dateFormat="MM/dd/yyyy, h:mm aa"
         showTimeInput
-        disabled={!startDate}
+        disabled={!DateTime.fromJSDate(startDate).isValid}
+        onCalendarClose={() => setCalendarIsOpen(false)}
+        onCalendarOpen={() => setCalendarIsOpen(true)}
         minDate={startDate}
-        maxDate={+startDate ? new Date(+startDate + maxTimeDiffInMs) : null}
-        onKeyDown={onKeyDown}
-        timeIntervals={timeInterval}
+        maxDate={DateTime.fromJSDate(startDate).plus({ hours: maxTimeDiff }).toJSDate()}
+        selectsEnd
+        startDate={startDate}
+        endDate={endDate}
       />
     </div>
   )

@@ -3,10 +3,6 @@ import { palette } from '../../utils/palette'
 import { constants } from '../../utils/constants';
 
 export const getChain = async ({ blockRange, startDate, endDate, miner, cid }) => {
-  if (startDate && endDate) {
-    blockRange = null;
-  }
-
   const { chain, orphans } = await getChainData({
     blockRange,
     startDate,
