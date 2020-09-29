@@ -30,8 +30,10 @@ const ChainPageComponent = () => {
           if (res.maxHeight) {
             const _maxBlock = Number(res.maxHeight)
 
-            changeFilter({ maxBlock: _maxBlock })
-            changeFilter({ blockRange: [Math.max(0, _maxBlock - constants.initialBlockRangeLimit), _maxBlock] })
+            changeFilter({
+              maxBlock: _maxBlock,
+              blockRange: [Math.max(0, _maxBlock - constants.initialBlockRangeLimit), _maxBlock],
+            })
           }
         }
       } catch (error) {
