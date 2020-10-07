@@ -6,7 +6,7 @@ export const getBlockById = async (id) => {
 
   wheres.push(['where', 'block', '=', id])
 
-  const url = `${config.slateUrl}/chain_visualizer_blocks_with_parents_view?where=${JSON.stringify(wheres)}&sort=${JSON.stringify([['height', 'asc']])}`;
+  const url = `${config.slateUrl}/chain-visualizer-blocks-with-parents-view?where=${JSON.stringify(wheres)}&sort=${JSON.stringify([['height', 'asc']])}`;
   const apiResponse = await fetch(url,
     {
       method: 'get',
@@ -18,7 +18,8 @@ export const getBlockById = async (id) => {
 }
 
 export const getBlockRange = async () => {
-  const url = `${config.slateUrl}/chain_visualizer_blocks_view_min_max`;
+  const url = `${config.slateUrl}/chain-visualizer-blocks-view-min-max`;
+  console.log(url);
   const apiResponse = await fetch(url,
     {
       method: 'get',
@@ -35,7 +36,7 @@ export const getBlockHeight = async (id) => {
 
   wheres.push(['where', 'cid', '=', id])
 
-  const url = `${config.slateUrl}/chain_visualizer_blocks_view?where=${JSON.stringify(wheres)}&sort=${JSON.stringify([['height', 'asc']])}`;
+  const url = `${config.slateUrl}/chain-visualizer-blocks-view?where=${JSON.stringify(wheres)}&sort=${JSON.stringify([['height', 'asc']])}`;
   const apiResponse = await fetch(url,
     {
       method: 'get',
@@ -54,7 +55,7 @@ export const getHeightByDate = async ({ startDate, endDate }) => {
     let wheres = []
     wheres.push(['where', 'timestamp', '>', seconds])
 
-    const url = `${config.slateUrl}/chain_visualizer_blocks_view?where=${JSON.stringify(wheres)}&limit=1&sort=${JSON.stringify([['height', 'asc']])}`;
+    const url = `${config.slateUrl}/chain-visualizer-blocks-view?where=${JSON.stringify(wheres)}&limit=1&sort=${JSON.stringify([['height', 'asc']])}`;
     const apiResponse = await fetch(url,
       {
         method: 'get',
@@ -71,7 +72,7 @@ export const getHeightByDate = async ({ startDate, endDate }) => {
     let wheres = []
     wheres.push(['where', 'timestamp', '<', seconds])
 
-    const url = `${config.slateUrl}/chain_visualizer_blocks_view?where=${JSON.stringify(wheres)}&limit=1&sort=${JSON.stringify([['height', 'desc']])}`;
+    const url = `${config.slateUrl}/chain-visualizer-blocks-view?where=${JSON.stringify(wheres)}&limit=1&sort=${JSON.stringify([['height', 'desc']])}`;
     const apiResponse = await fetch(url,
       {
         method: 'get',

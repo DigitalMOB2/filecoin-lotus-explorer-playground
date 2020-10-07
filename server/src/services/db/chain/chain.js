@@ -45,7 +45,8 @@ export const getChain = async ({ startBlock, endBlock, startDate, endDate, miner
     sortOrder = 'DESC'
   }
 
-  const url = `${config.slateUrl}/chain_visualizer_chain_data_view?offset=${skip}&limit=${limit}&where=${JSON.stringify(wheres)}&sort=${JSON.stringify([['height', 'asc']])}`;
+  const url = `${config.slateUrl}/chain-visualizer-chain-data-view?offset=${skip}&limit=${limit}&where=${JSON.stringify(wheres)}&sort=${JSON.stringify([['height', 'asc']])}`;
+  console.log (url);
   const apiResponse = await fetch(url,
     {
       method: 'get',
@@ -100,7 +101,7 @@ export const getOrphans = async ({ startBlock, endBlock, startDate, endDate, min
     sortOrder = 'DESC'
   }
 
-  const url = `${config.slateUrl}/chain_visualizer_orphans_view?offset=${skip}&limit=${limit}&where=${JSON.stringify(wheres)}&sort=${JSON.stringify([['height', 'asc']])}`;
+  const url = `${config.slateUrl}/chain-visualizer-orphans-view?offset=${skip}&limit=${limit}&where=${JSON.stringify(wheres)}&sort=${JSON.stringify([['height', 'asc']])}`;
   const apiResponse = await fetch(url,
     {
       method: 'get',
@@ -117,7 +118,7 @@ export const getGraph = async ({ start, end }) => {
   wheres.push(['where', 'height', '>', Number(start)])
   wheres.push(['where', 'height', '<', Number(end)])
 
-  const url = `${config.slateUrl}/chain_visualizer_blocks_with_parents_view?where=${JSON.stringify(wheres)}&sort=${JSON.stringify([['height', 'asc']])}`;
+  const url = `${config.slateUrl}/chain-visualizer-blocks-with-parents-view?where=${JSON.stringify(wheres)}&sort=${JSON.stringify([['height', 'asc']])}`;
   const apiResponse = await fetch(url,
     {
       method: 'get',
