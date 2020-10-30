@@ -46,7 +46,6 @@ export const getChain = async ({ startBlock, endBlock, startDate, endDate, miner
   }
 
   const url = `${config.slateUrl}/chain-visualizer-chain-data-view?offset=${skip}&limit=${limit}&where=${JSON.stringify(wheres)}&sort=${JSON.stringify([['height', 'asc']])}`;
-  console.log (url);
   const apiResponse = await fetch(url,
     {
       method: 'get',

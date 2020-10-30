@@ -18,8 +18,7 @@ export const getBlockById = async (id) => {
 }
 
 export const getBlockRange = async () => {
-  const url = `${config.slateUrl}/chain-visualizer-blocks-view-min-max`;
-  console.log(url);
+  const url = `${config.slateUrl}/chain-visualizer-chain-data-view?offset=0&limit=1&sort=${JSON.stringify([['height', 'desc']])}`;
   const apiResponse = await fetch(url,
     {
       method: 'get',
@@ -27,8 +26,8 @@ export const getBlockRange = async () => {
     })
 
   const body = await apiResponse.json();
-  console.log(body);
-  return body.data[0];
+
+  return { minHeight: "0", maxHeight: `${body.data[0].height}` };
 }
 
 export const getBlockHeight = async (id) => {
@@ -56,6 +55,7 @@ export const getHeightByDate = async ({ startDate, endDate }) => {
     wheres.push(['where', 'timestamp', '>', seconds])
 
     const url = `${config.slateUrl}/chain-visualizer-blocks-view?where=${JSON.stringify(wheres)}&limit=1&sort=${JSON.stringify([['height', 'asc']])}`;
+    console.log(url);
     const apiResponse = await fetch(url,
       {
         method: 'get',
