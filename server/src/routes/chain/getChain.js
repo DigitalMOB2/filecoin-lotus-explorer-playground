@@ -17,7 +17,6 @@ export const getChain = async (req, res) => {
     limit,
     sortOrder,
   }
-
   const blocksArr = await getChainData(query)
   const chain = blocksToChain(blocksArr, endBlock, startBlock)
   const orphans = await getOrphans(query)

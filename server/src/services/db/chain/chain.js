@@ -1,38 +1,33 @@
-import { db } from '../'
+import fetch from 'node-fetch';
+import { config } from '../../../../config'
 
 export const getChain = async ({ startBlock, endBlock, startDate, endDate, miner, cid, skip, limit, sortOrder }) => {
   const maxLimit = 500
   let wheres = []
-  let whereArgs = []
 
   if (startBlock) {
-    whereArgs.push(Number(startBlock))
-    wheres.push(`height >= $${whereArgs.length}`)
+    wheres.push(['where', 'height', '>=', Number(startBlock)])
   }
   if (endBlock) {
-    whereArgs.push(endBlock)
-    wheres.push(`height <= $${whereArgs.length}`)
+    wheres.push(['where', 'height', '<=', Number(endBlock)])
   }
   if (startDate) {
     let date = new Date(startDate)
     let seconds = date.getTime() / 1000
-    whereArgs.push(seconds)
-    wheres.push(`timestamp > $${whereArgs.length}`)
+    wheres.push(['where', 'timestamp', '>', seconds])
   }
   if (endDate) {
     let date = new Date(endDate)
     let seconds = date.getTime() / 1000
-    whereArgs.push(seconds)
-    wheres.push(`timestamp < $${whereArgs.length}`)
+    wheres.push(['where', 'timestamp', '<', seconds])
+
   }
   if (miner) {
-    whereArgs.push(miner)
-    wheres.push(`miner = $${whereArgs.length}`)
+    wheres.push(['where', 'miner', '=', miner])
   }
 
   if (cid) {
-    whereArgs.push(miner)
-    wheres.push(`cid = $${whereArgs.length}`)
+    wheres.push(['where', 'cid', '=', cid])
   }
 
   skip = Number(skip)
@@ -50,55 +45,44 @@ export const getChain = async ({ startBlock, endBlock, startDate, endDate, miner
     sortOrder = 'DESC'
   }
 
-  const query = `
-  SELECT * from chain_visualizer_chain_data_view
-    ${wheres.length ? 'WHERE' : ''}
-    ${wheres.join(' AND ')}
+  const url = `${config.slateUrl}/chain-visualizer-chain-data-view?offset=${skip}&limit=${limit}&where=${JSON.stringify(wheres)}&sort=${JSON.stringify([['height', 'asc']])}`;
+  const apiResponse = await fetch(url,
+    {
+      method: 'get',
+      headers: { 'Content-Type': 'application/json' },
+    })
 
-    ${sortOrder ? `ORDER BY height ${sortOrder}` : 'ORDER BY height ASC'}
-
-    ${skip ? `OFFSET ${skip}` : ''}
-
-    ${limit ? `LIMIT ${limit}` : ''}
-  `
-  const { rows } = await db.query(query, whereArgs)
-
-  return rows
+  const body = await apiResponse.json();
+  return body.data;
 }
 
 export const getOrphans = async ({ startBlock, endBlock, startDate, endDate, miner, cid, skip, limit, sortOrder }) => {
   const maxLimit = 500
   let wheres = []
-  let whereArgs = []
 
   if (startBlock) {
-    whereArgs.push(Number(startBlock))
-    wheres.push(`height >= $${whereArgs.length}`)
+    wheres.push(['where', 'height', '>=', Number(startBlock)])
   }
   if (endBlock) {
-    whereArgs.push(endBlock)
-    wheres.push(`height <= $${whereArgs.length}`)
+    wheres.push(['where', 'height', '<=', Number(endBlock)])
   }
   if (startDate) {
     let date = new Date(startDate)
     let seconds = date.getTime() / 1000
-    whereArgs.push(seconds)
-    wheres.push(`timestamp > $${whereArgs.length}`)
+    wheres.push(['where', 'timestamp', '>', seconds])
   }
   if (endDate) {
     let date = new Date(endDate)
     let seconds = date.getTime() / 1000
-    whereArgs.push(seconds)
-    wheres.push(`timestamp < $${whereArgs.length}`)
+    wheres.push(['where', 'timestamp', '<', seconds])
+
   }
   if (miner) {
-    whereArgs.push(miner)
-    wheres.push(`miner = $${whereArgs.length}`)
+    wheres.push(['where', 'miner', '=', miner])
   }
 
   if (cid) {
-    whereArgs.push(miner)
-    wheres.push(`cid = $${whereArgs.length}`)
+    wheres.push(['where', 'cid', '=', cid])
   }
 
   skip = Number(skip)
@@ -116,34 +100,30 @@ export const getOrphans = async ({ startBlock, endBlock, startDate, endDate, min
     sortOrder = 'DESC'
   }
 
-  const query = `
-    select * from chain_visualizer_orphans_view
+  const url = `${config.slateUrl}/chain-visualizer-orphans-view?offset=${skip}&limit=${limit}&where=${JSON.stringify(wheres)}&sort=${JSON.stringify([['height', 'asc']])}`;
+  const apiResponse = await fetch(url,
+    {
+      method: 'get',
+      headers: { 'Content-Type': 'application/json' },
+    })
 
-    ${wheres.length ? ' WHERE ' : ''}
-    ${wheres.join(' AND ')}
-
-    ${sortOrder ? `ORDER BY height ${sortOrder}` : 'ORDER BY height ASC'}
-
-    ${skip ? `OFFSET ${skip}` : ''}
-
-    ${limit ? `LIMIT ${limit}` : ''}
-    `
-    console.log(query);
-
-  const { rows } = await db.query(query, whereArgs)
-
-  return rows
+  const body = await apiResponse.json();
+  return body.data;
 }
 
 export const getGraph = async ({ start, end }) => {
-  const { rows } = await db.query(
-    `
-    SELECT * from chain_visualizer_blocks_with_parents_view
+  let wheres = []
 
-    WHERE
-      b.height > $1 and b.height < $2`,
-    [start, end],
-  )
+  wheres.push(['where', 'height', '>', Number(start)])
+  wheres.push(['where', 'height', '<', Number(end)])
 
-  return rows
+  const url = `${config.slateUrl}/chain-visualizer-blocks-with-parents-view?where=${JSON.stringify(wheres)}&sort=${JSON.stringify([['height', 'asc']])}`;
+  const apiResponse = await fetch(url,
+    {
+      method: 'get',
+      headers: { 'Content-Type': 'application/json' },
+    })
+
+  const body = await apiResponse.json();
+  return body.data;
 }

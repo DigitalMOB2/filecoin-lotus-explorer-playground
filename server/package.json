@@ -20,7 +20,8 @@
     "winston-transport": "^4.3.0",
     "d3": "^5.16.0",
     "d3-node": "^2.2.2",
-    "lodash": "^4.17.19"
+    "lodash": "^4.17.19",
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
     "@babel/core": "^7.7.5",
