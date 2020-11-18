@@ -15,6 +15,8 @@ import { Miners } from './Miners'
 import { RangeInputs } from './RangeInputs'
 import { DateInputs } from './DateInputs'
 import { ReceivedBlocks } from './ReceivedBlocks'
+import { GitHubCorners } from '../../../vendor/github.corners';
+import { FilecoinLogo } from '../../../vendor/filecoin.logo';
 
 const nodeLabelOptions = [
   { value: 'showHeightRuler', label: 'Block height ruler' },
@@ -66,12 +68,12 @@ const ControlsComponent = ({ minBlock, maxBlock }) => {
 
     if (allEmpty || notChanged) return
 
-    changeFiltersAction(dispatch, { [key]: value, startDate: null,  endDate: null })
+    changeFiltersAction(dispatch, { [key]: value, startDate: null, endDate: null })
   }
 
   const onClearDateFilter = () => {
     const payload = { startDate: '', endDate: '', blockRange: [maxBlock - constants.initialBlockRangeLimit, maxBlock] };
-    changeRange(dispatch, range,  [maxBlock - constants.initialBlockRangeLimit, maxBlock]);
+    changeRange(dispatch, range, [maxBlock - constants.initialBlockRangeLimit, maxBlock]);
     changeFiltersAction(dispatch, payload);
   };
 
@@ -81,7 +83,7 @@ const ControlsComponent = ({ minBlock, maxBlock }) => {
     try {
       const range = await getBlockRangeByDate({ startDate, endDate });
       const payload = { startDate, endDate, blockRange: [Number(range.minBlock), Number(range.maxBlock)] };
-      changeRange(dispatch, range,  [Number(range.minBlock), Number(range.maxBlock)]);
+      changeRange(dispatch, range, [Number(range.minBlock), Number(range.maxBlock)]);
       changeFiltersAction(dispatch, payload);
     } catch (e) {
       toast.warn('This date range was not found in our database.');
@@ -90,6 +92,14 @@ const ControlsComponent = ({ minBlock, maxBlock }) => {
 
   return (
     <Controls id="controls">
+      <Block style={{ display: 'flex', padding: 0, margin: 0, height: '80px', justifyContent: 'space-between', alignItems: 'center'  }}>
+
+        <div style={{ width: '30px', height: '30px', paddingLeft: '3px' }}>
+          <FilecoinLogo />
+        </div>
+        <Title style={{ fontSize: '15px', textAlign: 'center', marginRight: '-35px', marginBottom: 0}}>Filecoin Tipset Explorer</Title>
+        <GitHubCorners />
+      </Block>
       {process.env.REACT_APP_NETWORK && (
         <Block>
           <Title>Network: {process.env.REACT_APP_NETWORK}</Title>
